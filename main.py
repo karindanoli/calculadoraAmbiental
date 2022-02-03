@@ -37,6 +37,7 @@ def load_data():
     data = data[list(columns.values())]
 
     return data
+    st.write(data)
 
 
 # carregar os dados
@@ -49,9 +50,12 @@ labels = df.uf.unique().tolist()
 st.sidebar.header("Parâmetros")
 info_sidebar = st.sidebar.empty()    # placeholder, para informações filtradas que só serão carregadas depois
 
+st.write(df.enquadramento.value_counts())
+
+
 # Slider de seleção do ano
 st.sidebar.subheader("Ano")
-year_to_filter = st.sidebar.slider('Escolha o ano desejado', 2008, 2018, 2017)
+year_to_filter = st.sidebar.slider('Escolha o ano desejado', 2017)
 
 # Checkbox da Tabela
 st.sidebar.subheader("Tabela")
@@ -91,7 +95,14 @@ if tabela.checkbox("Mostrar tabela de dados"):
     st.write(filtered_df)
 
 plt.figure(figsize=(15, 5))
-plt.hist(df.uf, bins=30, rwidth=.8)
+plt.hist(df.uf, bins=30, rwidth=.8, color='g')
+plt.grid()
+st.pyplot(plt)
+plt.clf()
+
+
+plt.figure(figsize=(15, 5))
+plt.hist(df.uf, bins=np.linspace(100, 2500, 30), rwidth=.8, color='g', alpha=.3)
 plt.grid()
 st.pyplot(plt)
 plt.clf()
