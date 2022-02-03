@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-
+import Pages.Analises.TabelaDados as Graficos
+import Pages.Analises.DadosFiltrados as Dados
 
 
 def load_data():
@@ -44,14 +45,18 @@ def load_data():
 df = load_data()
 labels = df.uf.unique().tolist()
 
-
 # SIDEBAR
+
+
+
+st.sidebar.title('Menu')
+values = ['Graficos','Dados']
+Page_Dados = st.sidebar.selectbox('Tratamento de dados', values)
+
+
 # Parâmetros e número de ocorrências
 st.sidebar.header("Parâmetros")
-info_sidebar = st.sidebar.empty()    # placeholder, para informações filtradas que só serão carregadas depois
-
-st.write(df.enquadramento.value_counts())
-
+info_sidebar = st.sidebar.empty()  # placeholder, para informações filtradas que só serão carregadas depois
 
 # Slider de seleção do ano
 st.sidebar.subheader("Ano")
@@ -59,14 +64,9 @@ year_to_filter = st.sidebar.slider('Escolha o ano desejado', 2017)
 
 # Checkbox da Tabela
 st.sidebar.subheader("Tabela")
-tabela = st.sidebar.empty()    # placeholder que só vai ser carregado com o df_filtered
+tabela = st.sidebar.empty()  # placeholder que só vai ser carregado com o df_filtered
 
-# Multiselect com os lables únicos dos tipos de classificação
-label_to_filter = st.sidebar.multiselect(
-    label="Escolha o Estado",
-    options=labels,
-    default=["RJ", 'MG','MS','DF','SE','PR','CE','RN','MT','ES','PE','PB','BA']
-)
+
 
 # Informação no rodapé da Sidebar
 st.sidebar.markdown("""
@@ -74,38 +74,11 @@ A base de dados de ocorrências aeronáuticas é gerenciada pelo ***Centro de In
 Aeronáuticos (CENIPA)***.
 """)
 
-# Somente aqui os dados filtrados por ano são atualizados em novo dataframe
-filtered_df = df.uf.isin(label_to_filter)
 
-# Aqui o placehoder vazio finalmente é atualizado com dados do filtered_df
-info_sidebar.info("{} ocorrências selecionadas.".format(filtered_df.shape[0]))
+if Page_Dados == 'Graficos':
+    Graficos.GraficoEstados()
+    st.pyplot()
 
-
-
-
-# MAIN
-st.title("CENIPA - Acidentes Aeronáuticos")
-st.markdown(f"""
-            ℹ️ Estão sendo exibidas as ocorrências classificadas como **{", ".join(label_to_filter)}**
-            para o ano de **{year_to_filter}**.
-            """)
-
-# raw data (tabela) dependente do checkbox
-if tabela.checkbox("Mostrar tabela de dados"):
-    st.write(filtered_df)
-
-plt.figure(figsize=(15, 5))
-plt.hist(df.uf, bins=30, rwidth=.8, color='g')
-plt.grid()
-st.pyplot(plt)
-plt.clf()
-
-
-plt.figure(figsize=(15, 5))
-plt.hist(df.uf, bins=np.linspace(100, 2500, 30), rwidth=.8, color='g', alpha=.3)
-plt.grid()
-st.pyplot(plt)
-plt.clf()
-
-
-
+if Page_Dados == 'Dados':
+    Dados.ContagemEnquadramento()
+    Dados.ContagemPorEstado()
