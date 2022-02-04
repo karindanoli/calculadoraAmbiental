@@ -12,3 +12,8 @@ def ContagemEnquadramento():
 def ContagemPorEstado():
 
     st.write(main.df.loc[main.df.uf == 'RJ'].uf.value_counts())
+
+def ContagemRiosEstados():
+
+    st.write(main.df.uf.value_counts())
+

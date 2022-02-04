@@ -4,14 +4,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 import Pages.Analises.TabelaDados as Graficos
 import Pages.Analises.DadosFiltrados as Dados
+import Pages.Analises.TabelaUnica as Tabela
+
+
+
+st.title("MODV AMBIENTAL - MODELAGEM E ANÁLISE DE RISCO AMBIENTAL")
+st.write("**Desenvolvido por Karin de Oliveira**")
+st.header("Análise do índice de Qualidade de Água")
+st.write("Neste app, são feitas análises dos dados de uma base de dados provenientes do site dados abertos,"
+         "onde são armazenados grandes bancos de dados brasileiros e"
+         "que ficam liberados para todos.")
 
 
 def load_data():
-    """
-    Carrega os dados de ocorrências aeronáuticas do CENIPA.
 
-    :return: DataFrame com colunas selecionadas.
-    """
     columns = {'X': 'latitude',
                'Y': 'longitude',
                'OBJECTID': 'ID',
@@ -47,38 +53,30 @@ labels = df.uf.unique().tolist()
 
 # SIDEBAR
 
-
-
 st.sidebar.title('Menu')
-values = ['Graficos','Dados']
+values = ['Tabela','Graficos','Dados']
 Page_Dados = st.sidebar.selectbox('Tratamento de dados', values)
 
-
-# Parâmetros e número de ocorrências
+# Parâmetros e número de dados
 st.sidebar.header("Parâmetros")
 info_sidebar = st.sidebar.empty()  # placeholder, para informações filtradas que só serão carregadas depois
 
-# Slider de seleção do ano
-st.sidebar.subheader("Ano")
-year_to_filter = st.sidebar.slider('Escolha o ano desejado', 2017)
-
-# Checkbox da Tabela
-st.sidebar.subheader("Tabela")
-tabela = st.sidebar.empty()  # placeholder que só vai ser carregado com o df_filtered
-
-
-
 # Informação no rodapé da Sidebar
 st.sidebar.markdown("""
-A base de dados de ocorrências aeronáuticas é gerenciada pelo ***Centro de Investigação e Prevenção de Acidentes 
-Aeronáuticos (CENIPA)***.
+A base de dados de utilizada se encontra no site ***Dados abertos - Índice de Qualidade de Água***.
 """)
 
+if Page_Dados == 'Tabela':
+    Tabela.TabelaIqa()
 
 if Page_Dados == 'Graficos':
     Graficos.GraficoEstados()
-    st.pyplot()
 
 if Page_Dados == 'Dados':
+    st.title('Contagem por enquadramento')
     Dados.ContagemEnquadramento()
+    st.title('Contagem por Estado')
     Dados.ContagemPorEstado()
+    st.title('Contagem Rios por Estado')
+    Dados.ContagemRiosEstados()
+

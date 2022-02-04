@@ -6,7 +6,10 @@ import main as main
 
 
 def GraficoEstados():
+    st.title('Grafico Contagem por Estados')
     plt.figure(figsize=(15, 5))
-    main.df.uf.value_counts().iloc[:2].plot()
+    plt.hist(main.df.uf, bins=30, rwidth=.8)
     plt.grid()
+    st.pyplot(plt)
+
 
