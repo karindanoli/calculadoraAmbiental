@@ -28,6 +28,7 @@ executing==1.2.0
 Flask==2.2.3
 fonttools==4.38.0
 funcy==1.18
+future==0.18.3
 gensim==3.8.3
 gitdb==4.0.10
 GitPython==3.1.31
@@ -92,6 +93,7 @@ psutil==5.9.4
 ptyprocess==0.7.0
 pure-eval==0.2.2
 pyarrow==10.0.1
+pycaret==2.3.10
 pydantic==1.10.5
 pydeck==0.8.0
 Pygments==2.14.0
@@ -119,6 +121,7 @@ seaborn==0.12.2
 semver==2.13.0
 shap==0.41.0
 six==1.16.0
+sklearn==0.0.post1
 slicer==0.0.7
 smart-open==6.3.0
 smmap==5.0.0
