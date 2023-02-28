@@ -6,6 +6,7 @@ import Pages.Analises.TabelaDados as Graficos
 import Pages.Analises.DadosFiltrados as Dados
 import Pages.Analises.TabelaUnica as Tabela
 from Pages.Analises import Cadastro
+
 # from Pages.Analises.Regression import RegressionModel
 # from pycaret import load_model, predict_model
 
@@ -16,17 +17,17 @@ st.write("Neste app, são feitas análises dos dados de uma base de dados proven
          "onde são armazenados grandes bancos de dados brasileiros e"
          "que ficam liberados para todos.")
 
-st.write("O Índice de Qualidade de Água (IQA) médio anual de um ponto de monitoramento é calculado a partir da média dos valores" 
-"do índice obtidos nas medições realizadas naquele ponto durante o ano. Os valores de IQA calculados correspondem aos dados" 
-"das próprias entidades responsáveis pelo monitoramento nas Unidades da Federação," 
-"em virtude das variações entre as fórmulas utilizadas para o cálculo,"
-"com o intuito de uniformizar a forma de cálculo do IQA e tornar os valores comparáveis para todo o território nacional")
+st.write("O Índice de Qualidade de Água (IQA) médio anual de um ponto de monitoramento é calculado a partir da média "
+         "dos valores"
+         "do índice obtidos nas medições realizadas naquele ponto durante o ano. Os valores de IQA calculados correspondem "
+         "aos dados"
+         "das próprias entidades responsáveis pelo monitoramento nas Unidades da Federação,"
+         "em virtude das variações entre as fórmulas utilizadas para o cálculo,"
+         "com o intuito de uniformizar a forma de cálculo do IQA e tornar os valores comparáveis para todo o território "
+         "nacional")
 
 
 def load_data():
-
-
-
     data = pd.read_csv('IQA2017.csv')
 
     columns = {'X': 'latitude',
@@ -51,20 +52,21 @@ def load_data():
     data = data.rename(columns=columns)
 
     data = data[list(columns.values())]
+    st.write(data)
 
     return data
-    st.write(data)
+
 
 # modelo = load_model('modeloCombinadoDoutorado')
 
 @st.cache
 def ler_dados():
-	dados = pd.read_csv('IQA2017.csv')
-	dados = dados.dropna()
-	return dados
+    dados = pd.read_csv('IQA2017.csv')
+    dados = dados.dropna()
+    return dados
+
 
 dados = ler_dados()
-
 
 # carregar os dados
 df = load_data()
@@ -73,7 +75,7 @@ labels = df.uf.unique().tolist()
 # SIDEBAR
 
 st.sidebar.title('Menu')
-values = ['Tabela','Graficos','Dados','Cadastro']
+values = ['Tabela', 'Graficos', 'Dados', 'Cadastro']
 Page_Dados = st.sidebar.selectbox('Tratamento de dados', values)
 
 # Parâmetros e número de dados
@@ -152,6 +154,6 @@ if Page_Dados == 'Cadastro':
 #     st.markdown(
 #         '## **Quando terminar de preencher as informações, clique no botão abaixo para estimar o IQA**')
 
-    # if st.button('EXECUTAR O MODELO'):
-    #     saida = float(predict_model(modelo, dados)['Label'])
-    #     st.markdown('## IQA **R$ {:.2f}**'.format(saida))
+# if st.button('EXECUTAR O MODELO'):
+#     saida = float(predict_model(modelo, dados)['Label'])
+#     st.markdown('## IQA **R$ {:.2f}**'.format(saida))
