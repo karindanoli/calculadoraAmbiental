@@ -5,6 +5,7 @@ import numpy as np
 import Pages.Analises.TabelaDados as Graficos
 import Pages.Analises.DadosFiltrados as Dados
 import Pages.Analises.TabelaUnica as Tabela
+import Pages.Analises.Qualidade as Qualidade
 from Pages.Analises import Cadastro
 from Pages.Analises.Regression import RegressionModel
 from pycaret.classification import load_model, predict_model
@@ -74,7 +75,7 @@ labels = df.uf.unique().tolist()
 # SIDEBAR
 
 st.sidebar.title('Menu')
-values = ['Tabela', 'Graficos', 'Dados', 'Cadastro']
+values = ['Qualidade','Previsao_Qualidade', 'ecotoxicologico', 'ecologico','ARE', 'Cadastro', 'Tabela','Graficos','Dados']
 Page_Dados = st.sidebar.selectbox('Tratamento de dados', values)
 
 # Parâmetros e número de dados
@@ -85,6 +86,19 @@ info_sidebar = st.sidebar.empty()  # placeholder, para informações filtradas q
 st.sidebar.markdown("""
 A base de dados de utilizada se encontra no site ***Dados abertos - Índice de Qualidade de Água***.
 """)
+
+if Page_Dados == 'Qualidade':
+    Tabela.TabelaIqa()
+if Page_Dados == 'Previsao_Qualidade':
+    Tabela.TabelaIqa()
+
+if Page_Dados == 'ecotoxicologico':
+    Tabela.TabelaIqa()
+if Page_Dados == 'ecologico':
+    Tabela.TabelaIqa()
+if Page_Dados == 'ARE':
+    Tabela.TabelaIqa()
+
 
 if Page_Dados == 'Tabela':
     Tabela.TabelaIqa()
