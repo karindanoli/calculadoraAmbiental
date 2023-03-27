@@ -34,7 +34,7 @@ def load_data():
 
 @st.cache
 def ler_dados():
-    dados = pd.read_csv('IQA2017.csv')
+    dados = pd.read_csv('tabelaPontosDeColeta.csv')
     dados = dados.dropna()
     return dados
 
