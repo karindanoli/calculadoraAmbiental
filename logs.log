@@ -1,0 +1,6 @@
+2023-06-10 18:09:51,508:INFO:Initializing load_model()
+2023-06-10 18:09:51,508:INFO:load_model(model_name=modeloCombinadoDoutorado, platform=None, authentication=None, verbose=True)
+2023-06-18 16:49:38,535:INFO:Initializing load_model()
+2023-06-18 16:49:38,535:INFO:load_model(model_name=modeloCombinadoDoutorado, platform=None, authentication=None, verbose=True)
+2023-06-18 16:51:04,878:INFO:Initializing load_model()
+2023-06-18 16:51:04,878:INFO:load_model(model_name=modeloCombinadoDoutorado, platform=None, authentication=None, verbose=True)
