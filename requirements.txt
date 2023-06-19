@@ -37,7 +37,7 @@ gunicorn==20.1.0
 htmlmin==0.1.12
 idna==3.4
 ImageHash==4.3.1
-imbalanced-learn==0.7.0
+imbalanced-learn
 importlib-metadata==5.2.0
 importlib-resources==5.12.0
 ipykernel==6.21.2
@@ -95,7 +95,7 @@ psutil==5.9.4
 ptyprocess==0.7.0
 pure-eval==0.2.2
 pyarrow==10.0.1
-pycaret==2.3.10
+pycaret
 pydantic==1.10.5
 pydeck==0.8.0
 Pygments==2.14.0

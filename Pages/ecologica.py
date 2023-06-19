@@ -1,54 +1,68 @@
 import streamlit as st
 import pandas as pd
 import math
+import plotly.graph_objects as go
 
 
-def AnaliseEcologica():
-        # Set the title and markdown text for the page
-        st.markdown("Explicação sobre o calculo de evidência ecológica")
+st.markdown("Explicação sobre o calculo de evidência ecológica")
 
-        # Create a table with the example data
-        data = {
-        "Reference": [10, 957, 50],
-        "Site A": [8, 750, 38],
-        "Site B": [5, 233, 10]
-        }
+# Cria tabela
+data = {
+"Referencia": [10, 957, 50],
+"Ponto 1": [8, 750, 38],
+"Ponto 2": [5, 233, 10]
+}
 
-        df = pd.DataFrame(data, index=["Taxa (No.)", "Individuals (No.)", "Herbivores (%)"])
+df = pd.DataFrame(data, index=["Taxa (No.)", "Indivíduos (No.)", "Microalgas (%)"])
 
 
-        st.table(df)
+st.table(df)
 
-        # Perform the calculations
-        ref_values = df["Reference"]
-        site_a_values = df["Site A"]
-        site_b_values = df["Site B"]
+# Coleta valores da tabela
+ref_values = df["Referencia"]
+site_a_values = df["Ponto 1"]
+site_b_values = df["Ponto 2"]
 
-        # Step 1: Ratio between site x and reference
-        ratio_a = site_a_values / ref_values
-        ratio_b = site_b_values / ref_values
+# divisão do valor da amostra pelo valor de referência.
+taxa_a = site_a_values / ref_values
+taxa_b = site_b_values / ref_values
 
-        # Step 2: Calculate absolute values of log (R1)
-        log_ratio_a = abs(ratio_a.apply(math.log10))
-        log_ratio_b = abs(ratio_b.apply(math.log10))
+# Calcula o log (R1)
+log_a = abs(taxa_a.apply(math.log10))
+log_b = abs(taxa_b.apply(math.log10))
 
-        # Step 3: Calculate sum of all values and multiply with -1
-        result_a = -1 * log_ratio_a.sum()
-        result_b = -1 * log_ratio_b.sum()
+# Calcula a soma dos logs e multiplicca por -1
+result_a = -1 * log_a.sum()
+result_b = -1 * log_b.sum()
 
-        # Step 4: Calculate number of endpoints
-        num_endpoints = len(df.columns)
+# calcula o n para a média
+num_valores = len(df.columns)
 
-        # Step 5: Use results from step 3 and 4 in the BKX_Triad formula
-        bkx_triad_a = 1 - math.pow(10, (result_a / num_endpoints))
-        bkx_triad_b = 1 - math.pow(10, (result_b / num_endpoints))
+# Finaliza a BKX_Triad
+bkx_triad_a = 1 - math.pow(10, (result_a / num_valores))
+bkx_triad_b = 1 - math.pow(10, (result_b / num_valores))
 
-        # Display the results
-        results_data = {
-        "Reference": [0, 0, 0],
-        "Site A": [0, result_a, bkx_triad_a],
-        "Site B": [0, result_b, bkx_triad_b]
-        }
+# Display the results
+results_data = {
+"Referencia": [0, 0, 0],
+"Ponto 1": [0, result_a, bkx_triad_a],
+"Ponto 2": [0, result_b, bkx_triad_b]
+}
 
-        results_df = pd.DataFrame(results_data, index=["Results (R3)", "Results (R4)", "Results (R5)"])
-        st.table(results_df)
+results_df = pd.DataFrame(results_data, index=["Referencia", "Ponto 1", "Ponto 2"])
+st.table(results_df)
+
+# grafico
+fig = go.Figure()
+for column in results_df.columns:
+    fig.add_trace(go.Bar(x=[column], y=[results_df[column][1]], name=column))
+
+fig.update_layout(
+    title="Results",
+    xaxis_title="Columns",
+    yaxis_title="Result",
+    width=600,
+    height=400
+)
+
+st.plotly_chart(fig)

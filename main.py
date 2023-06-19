@@ -56,7 +56,7 @@ if uploaded_file is not None:
 # SIDEBAR
 
 st.sidebar.title('Menu')
-values = ['Evidência Ecológica', 'Evidência Ecotoxicológica', 'Análise integrada', 'Mapa', 'Tabela', 'Previsão IQA']
+values = ['Evidência Ecológica', 'Evidência Ecotoxicológica', 'Análise integrada', 'Mapa', 'Previsão IQA']
 Page_Dados = st.sidebar.selectbox('Tratamento de dados', values)
 
 # Parâmetros e número de dados
@@ -68,23 +68,20 @@ st.sidebar.markdown("""
 A base de dados de utilizada se encontra no site ***Dados abertos - Índice de Qualidade de Água***.
 """)
 
-if Page_Dados == 'Tabela':
-    Tabela.TabelaIqa()
-
 if Page_Dados == 'Evidência Ecológica':
     st.title("Evidência Ecológica")
-    ecologica.AnaliseEcologica()
+    # ecologica.AnaliseEcologica()
 
 if Page_Dados == 'Evidência Ecotoxicológica':
     st.title("Evidência Ecotoxicológica")
 
 if Page_Dados == 'Risco Integrado':
     st.title("Risco Integrado")
-    integrado.AnaliseIntegrada()
+    # integrado.AnaliseIntegrada()
 
 if Page_Dados == 'Previsao':
     st.title('Modelo de previsão do IQA')
-    RegressionModel("MS", "lotico", 2, "Rio Cachoeirão", 2017, 6, 70.6, 75.3, 2.38, 5.65)
+    # RegressionModel("MS", "lotico", 2, "Rio Cachoeirão", 2017, 6, 70.6, 75.3, 2.38, 5.65)
 
 if Page_Dados == 'Mapa':
-    st.title('Modelo de previsão do IQA')
+    st.title('Mapa de pontos de coleta')

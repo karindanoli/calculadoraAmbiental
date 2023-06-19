@@ -1,75 +1,85 @@
 import streamlit as st
 import matplotlib.pyplot as plt
-import numpy as np
 import math
+import plotly.graph_objects as go
 
 
-def AnaliseIntegrada():
 
-    # Set the title and markdown text for the page
-    st.title("Evidência ecológico integrado")
-    st.markdown("coisas de evidência ecológica")
+st.title("Análise integrada")
+st.markdown("Explicação sobre o calculo de análise integrada")
 
-    # Retrieve the results from the different pages
-    result_page1 = 0.8  # Replace with the actual result from page 1
-    result_page2 = 0.6  # Replace with the actual result from page 2
-    result_page3 = 0.7  # Replace with the actual result from page 3
+# Resultados das análises
+result_page1 = 0.8
+result_page2 = 0.6
+result_page3 = 0.7
 
-    # Perform the calculations
-    log_result_page1 = math.log(result_page1)
-    R1 = 1 - log_result_page1
-    R2 = 1 - result_page2
-    R3 = 1 - result_page3
+# Log dos resultados
+log_result_page1 = math.log(result_page1)
+log_result_page2 = math.log(result_page2)
+log_result_page3 = math.log(result_page3)
 
-    B = 1.5
-    C = 2
-    D = 1
+R1 = 1 - log_result_page1
+R2 = 1 - log_result_page2
+R3 = 1 - log_result_page3
 
-    R = (R1 * B + R2 * C + R3 * D) / (B + C + D)
+# Valores fixos vindos de JENSEN & MESMAN, 2006
+B = 1.5
+C = 2
+D = 1
 
-    # Determine the risk category based on the result
-    risk_category = ""
-    if 0 <= R <= 0.25:
-        risk_category = "Low risk"
-    elif 0.25 < R <= 0.5:
-        risk_category = "Moderate risk"
-    elif 0.5 < R <= 0.75:
-        risk_category = "High risk"
-    elif R > 0.75:
-        risk_category = "Too much risk"
+R = (R1 * B + R2 * C + R3 * D) / (B + C + D)
 
-    # Display the result
-    st.subheader("Result")
-    st.text(f"R = {R:.2f}")
-    st.text("Risk Category: " + risk_category)
+# Categorias de risco
+risk_category = ""
+if 0 <= R <= 0.25:
+    risk_category = "Risco baixo"
+elif 0.25 < R <= 0.5:
+    risk_category = "Risco moderado"
+elif 0.5 < R <= 0.75:
+    risk_category = "Risco alto"
+elif R > 0.75:
+    risk_category = "Risco altissímo"
 
-    # Create the gauge graphic
-    fig, ax = plt.subplots()
+# Resultado
+st.subheader("Result")
+st.text(f"R = {R:.2f}")
+st.text("Risk Category: " + risk_category)
 
-    # Define the gauge range and colors
-    gauge_range = [0, 0.25, 0.5, 0.75, 1]
-    colors = ["green", "yellowgreen", "orange", "red"]
+# Grafico gauge
+fig = go.Figure(go.Indicator(
+    mode="gauge+number",
+    value=R,
+    domain={'x': [0, 1], 'y': [0, 1]},
+    gauge={
+        'axis': {'range': [0, 1]},
+        'bar': {'color': "darkblue"},
+        'steps': [
+            {'range': [0, 0.25], 'color': 'green'},
+            {'range': [0.25, 0.5], 'color': 'yellow'},
+            {'range': [0.5, 0.75], 'color': 'orange'},
+            {'range': [0.75, 1], 'color': 'red'}
+        ],
+        'threshold': {
+            'line': {'color': "red", 'width': 4},
+            'thickness': 0.75,
+            'value': R
+        }
+    }
+))
 
-    # Create the gauge sectors
-    for i in range(len(gauge_range) - 1):
-        start_angle = 90 - (gauge_range[i] * 180)
-        end_angle = 90 - (gauge_range[i + 1] * 180)
-        sector = plt.Wedge((0.5, 0.5), 0.4, start_angle, end_angle, width=0.2, facecolor=colors[i])
-        ax.add_patch(sector)
 
-    # Add the needle to indicate the result
-    needle_angle = 90 - (R * 180)
-    needle = plt.Wedge((0.5, 0.5), 0.2, needle_angle, needle_angle, width=0.02, facecolor="black")
-    ax.add_patch(needle)
+fig.update_layout(
+    title_text="Risk Level",
+    width=400,
+    height=300,
+)
 
-    # Set the aspect ratio and remove axis
-    ax.set(aspect="equal")
-    ax.axis("off")
 
-    # Display the gauge graphic
-    st.pyplot(fig)
+st.plotly_chart(fig)
 
-    # Display additional information
-    st.markdown("""
-    The calculation is performed by retrieving the results from the different pages and applying the specified formula. The resulting value, R, is then categorized into different risk levels based on the specified ranges.
-    """)
+# legenda
+st.markdown("""O cálculo é baseado na análise integrada da ARE, onde R é o resultado. Os niveís de risco:""")
+st.markdown("""0 <= R <= 0.25 - Risco baixo - verde""")
+st.markdown("""0.25 < R <= 0.5 - Risco moderado - amarelo""")
+st.markdown("""0.5 < R <= 0.75 - Risco alto - laranja""")
+st.markdown("""R > 0.75 - Risco altissímo - vermelho""")
