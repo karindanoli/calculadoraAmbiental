@@ -55,6 +55,8 @@ kiwisolver==1.4.4
 kmodes==0.12.2
 lightgbm==3.3.5
 llvmlite==0.36.0
+loguru
+streamlit_option_menu
 Mako==1.2.4
 Markdown==3.4.1
 markdown-it-py==2.2.0

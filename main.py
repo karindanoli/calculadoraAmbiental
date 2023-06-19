@@ -16,6 +16,10 @@ if enable_logging:
 apps = [
     {"func": home.app, "title": "Home", "icon": "house"},
     {"func": iqa.app, "title": "Calcular IQA", "icon": "calculator"},
+    {"func": integrado.app, "title": "Integrado", "icon": "house"},
+    {"func": mapa.app, "title": "Mapa", "icon": "calculator"},
+    {"func": ecologica.app, "title": "Ecologica", "icon": "calculator"},
+    {"func": previsaoIqa.app, "title": "previsaoIqa", "icon": "house"},
 ]
 
 titles = [app["title"] for app in apps]

@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
-import iqa.color_classificacao
+from apps.iqa import color_classificacao
+
 
 
 def app():
