@@ -165,3 +165,17 @@ wordcloud==1.8.2.2
 ydata-profiling==4.0.0
 yellowbrick==1.5
 zipp==3.15.0
+--find-links=https://girder.github.io/large_image_wheels GDAL
+geemap
+geopandas
+jupyter-server-proxy
+keplergl
+leafmap~=0.18.8
+localtileserver
+nbserverproxy
+streamlit~=1.20.0
+streamlit-option-menu
+pandas~=1.5.3
+numpy~=1.24.2
+loguru~=0.6.0
+streamlit_option_menu
