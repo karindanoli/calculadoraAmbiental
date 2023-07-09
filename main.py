@@ -1,30 +1,28 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from apps import home, iqa
-from loguru import logger
-from pathlib import Path
+from apps import home, iqa, integrado, mapa, ecologica, previsaoIqa
 
-st.set_page_config(page_title="MODV AMBIENTAL", layout="wide")
-enable_logging = False
+st.title("Home")
+st.markdown(
+    """
+     Neste app, são feitas análises dos dados de uma base de dados provenientes do site dados abertos,
+     onde são armazenados grandes bancos de dados brasileiros e que ficam liberados para todos
 
-if enable_logging:
-    logname = "file_1.log"
-    logger.add(logname)
-    lines = "\n".join(Path(logname).read_text().splitlines()[-10:])
-    st.code(lines)
+     Um exemplo de um banco de dados processado abaixo:
+"""
+)
 
 apps = [
-    {"func": home.app, "title": "Home", "icon": "house"},
-    {"func": iqa.app, "title": "Calcular IQA", "icon": "calculator"},
-    {"func": integrado.app, "title": "Integrado", "icon": "house"},
-    {"func": mapa.app, "title": "Mapa", "icon": "calculator"},
-    {"func": ecologica.app, "title": "Ecologica", "icon": "calculator"},
-    {"func": previsaoIqa.app, "title": "previsaoIqa", "icon": "house"},
+    {"func": home.app, "title": "Home"},
+    {"func": iqa.app, "title": "Calcular LOE IQA"},
+    # {"func": integrado.app, "title": "Integrado"},
+    # {"func": mapa.app, "title": "Mapa", "icon": "calculator"},
+    {"func": ecologica.app, "title": "Calcular LOE Ecologica"},
+    # {"func": previsaoIqa.app, "title": "previsaoIqa"},
 ]
 
 titles = [app["title"] for app in apps]
 titles_lower = [title.lower() for title in titles]
-icons = [app["icon"] for app in apps]
 
 params = st.experimental_get_query_params()
 
@@ -36,10 +34,7 @@ else:
 with st.sidebar:
     selected = option_menu(
         "Menu Principal",
-        options=titles,
-        icons=icons,
-        menu_icon="cast",
-        default_index=default_index,
+        options=titles
     )
 
     st.sidebar.title("Sobre")

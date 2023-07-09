@@ -1,38 +1,13 @@
-import base64
-import os
-import tempfile
-import uuid
 from typing import Dict, Any
+from utils import download
+from utils import uploadFiles
+import base64
 
 import numpy as np
 import pandas as pd
 import streamlit as st
 from loguru import logger
 
-
-def save_uploaded_file(file_content, file_name):
-    """
-    Salva o arquivo que foi subido para um diretório temporário
-    """
-
-    _, file_extension = os.path.splitext(file_name)
-    file_id = str(uuid.uuid4())
-    file_path = os.path.join(tempfile.gettempdir(), f"{file_id}{file_extension}")
-
-    with open(file_path, "wb") as file:
-        file.write(file_content.getbuffer())
-
-    return file_path
-
-
-def download_template():
-    example = pd.DataFrame(columns=["ID", "Pontos de Coleta", "pH", "OD(mg/L)", "CE(uS/cm2)", "Turbidez(NTU)",
-                                    "Temp.liq(Celsius)", "ORP(mV)", "STD(g/L)", "Salinidade", "DQO(mg/L)", "DBO(mg/L)",
-                                    "Fosforo(mg/L)", "Amonia(mg/L)", "Nitrato(mg/L)", "CT(NMP/100mL)", "CTE(NMP/100mL)"
-                                    ])
-    csv = example.to_csv(index=False)
-    b64 = base64.b64encode(csv.encode()).decode()
-    return f'<a href="data:file/csv;base64,{b64}" download="tabelaTemplate.csv">Download tabelaTemplate.csv</a>'
 
 
 def create_table():
@@ -48,11 +23,8 @@ def create_table():
         st.session_state.reset_key = 0
 
     default_values = {
-        "ID": "", "Pontos de Coleta": "", "pH": "", "OD(mg/L)": "", "CE(uS/cm2)": "",
-        "Turbidez(NTU)": "", "Temp.liq(Celsius)": "", "ORP(mV)": "", "STD(g/L)": "",
-        "Salinidade": "", "DQO(mg/L)": "", "DBO(mg/L)": "", "Fosforo(mg/L)": "",
-        "Amonia(mg/L)": "", "Nitrato(mg/L)": "", "CT(NMP/100mL)": "", "CTE(NMP/100mL)": ""
-    }
+        "ID": "", "Pontos de Coleta": "", "CTE": "", "PH": "", "DBO": "", "Turbidez": "",
+                                    "NT": "", "PT": "", "TEMP": "", "SOLIDOS": "", "OD": ""}
 
     with st.form(key="table_form"):
         input_data: Dict[Any, Any] = {}
@@ -79,6 +51,7 @@ def create_table():
         dataframe = pd.DataFrame(input_rows)
         st.session_state.user_created_table = dataframe
         st.write(dataframe)
+        return dataframe
     else:
         st.write("Preencha a tabela e clique em 'Criar tabela' para visualizar os dados. ")
 
@@ -86,33 +59,98 @@ def create_table():
         st.session_state.reset_key += 1
         st.experimental_rerun()
 
+def download_template():
+    example = pd.DataFrame(columns=["ID", "Pontos de Coleta", "CTE", "PH", "DBO", "Turbidez",
+                                    "NT", "PT", "TEMP", "SOLIDOS", "OD"])
+    csv = example.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()
+    return f'<a href="data:file/csv;base64,{b64}" download="tabelaTemplate.csv">Download tabelaTemplate.csv</a>'
 
-def calculate_iqa(df):
-    """
-    O cálculo do IQA é feito aqui. Também é aqui que as colunas IQA e Classificacao são adicionadas.
-    A classificação depende da pontuação IQA
-    """
 
-    # Placeholder for the actual IQA calculation
-    # Add your calculation logic here
-    iqa = 0
-    df["IQA"] = iqa
-    # Add "Classificacao" based on the IQA score
-    df["Classificacao"] = ""
+def leng_data(dataframe):
+    length = len(dataframe)
+    return length
 
-    conditions = [
-        (df["IQA"] >= 91) & (df["IQA"] <= 100),
-        (df["IQA"] >= 71) & (df["IQA"] <= 90),
-        (df["IQA"] >= 51) & (df["IQA"] <= 70),
-        (df["IQA"] >= 26) & (df["IQA"] <= 50),
-        (df["IQA"] >= 0) & (df["IQA"] <= 25)
-    ]
 
-    classifications = ["Otima", "Boa", "Razoavel", "Ruim", "Pessimo"]
+def calculate_iqa(dataframe):
+    # length = leng_data(dataframe)
+    #
+    # for i in range(3):
+    #     total_mult = 0
+    #     print(i)
 
-    df["Classificacao"] = np.select(conditions, classifications, default=0)
+        for column, value_df in zip(dataframe.columns, dataframe.values.T):
+                total_mult = 0
+                if column == 'CTE':
+                    qi_CTE = -8.723 * np.log(pd.to_numeric(value_df)) + 88.714
+                    iqa_CTE = qi_CTE ** 0.15
+                    total_mult = total_mult * iqa_CTE
+                    print(qi_CTE, iqa_CTE, total_mult,pd.to_numeric(value_df))
 
-    return df
+                elif column == 'PH':
+                    qi_PH = 93 * np.exp(-(((pd.to_numeric(value_df) - 7.5) ** 2) / 2 * (0.652 ** 2)))
+                    iqa_PH = qi_PH ** 0.12
+                    total_mult = total_mult * iqa_PH
+                    print(qi_PH, iqa_PH, total_mult,pd.to_numeric(value_df))
+
+                elif column == 'DBO':
+                    qi_DBO = -30.1 * np.log(pd.to_numeric(value_df)) + 103.45
+                    iqa_DBO = np.abs(qi_DBO ** 0.1)
+                    total_mult = total_mult * iqa_DBO
+                    print(qi_DBO, iqa_DBO, total_mult,pd.to_numeric(value_df))
+
+                elif column == 'Turbidez':
+                    qi_Turbidez = -26.45 * np.log(pd.to_numeric(value_df)) + 136.37
+                    iqa_Turbidez = qi_Turbidez ** 0.08
+                    total_mult = total_mult *  iqa_Turbidez
+                    print(qi_Turbidez, iqa_Turbidez, total_mult,pd.to_numeric(value_df))
+
+                elif column == 'NT':
+                    qi_NT = -20.8 * np.log(pd.to_numeric(value_df)) + 93.092
+                    iqa_NT = qi_NT ** 0.1
+                    total_mult = total_mult *  iqa_NT
+                    print(qi_NT, iqa_NT, total_mult,pd.to_numeric(value_df))
+
+                elif column == 'PT':
+                    qi_PT = -15.49 * np.log(pd.to_numeric(value_df)) + 37.202
+                    iqa_PT = qi_PT ** 0.1
+                    total_mult = total_mult * iqa_PT
+                    print(qi_PT, iqa_PT, total_mult,pd.to_numeric(value_df))
+
+                elif column == 'TEMP':
+                    qi_TEMP = 92 * np.exp(-(((pd.to_numeric(value_df) - 0) ** 2) / 2 * (0.25 ** 2)))
+                    iqa_TEMP = qi_TEMP ** 0.1
+                    total_mult = total_mult * iqa_TEMP
+                    print(qi_TEMP, iqa_TEMP, total_mult,pd.to_numeric(value_df))
+
+                elif column == 'SOLIDOS':
+                    qi_SOLIDOS = 80 * np.exp(-(((pd.to_numeric(value_df) - 50) ** 2) / 2 * (0.003 ** 2)))
+                    iqa_SOLIDOS = qi_SOLIDOS ** 0.08
+                    total_mult = total_mult * iqa_SOLIDOS
+                    print(qi_SOLIDOS, iqa_SOLIDOS, total_mult,pd.to_numeric(value_df))
+
+                elif column == 'OD':
+                    qi_OD = 100 * np.exp(-(((pd.to_numeric(value_df) - 100) ** 2) / 2 * (0.025 ** 2)))
+                    iqa_OD = qi_OD ** 0.17
+                    total_mult = total_mult * iqa_OD
+                    print(qi_OD, iqa_OD, total_mult,pd.to_numeric(value_df))
+
+                dataframe["IQA"] = total_mult
+
+                conditions = [
+                    (dataframe["IQA"] >= 91) & (dataframe["IQA"] <= 100),
+                    (dataframe["IQA"] >= 71) & (dataframe["IQA"] <= 90),
+                    (dataframe["IQA"] >= 51) & (dataframe["IQA"] <= 70),
+                    (dataframe["IQA"] >= 26) & (dataframe["IQA"] <= 50),
+                    (dataframe["IQA"] >= 0) & (dataframe["IQA"] <= 25)
+                ]
+
+                classifications = ["Otima", "Boa", "Razoavel", "Ruim", "Pessimo"]
+
+                dataframe["Classificacao"] = np.select(conditions, classifications, default=0)
+
+        return dataframe
+
 
 
 def color_classificacao(val):
@@ -129,12 +167,6 @@ def color_classificacao(val):
         color = 'black'
 
     return f'background-color: {color}'
-
-
-def get_table_download_link(df):
-    csv = df.to_csv(index=False)
-    b64 = base64.b64encode(csv.encode()).decode()
-    return f'<a href="data:file/csv;base64,{b64}" download="resultados.csv">Download resultados.csv</a>'
 
 
 def app():
@@ -173,24 +205,24 @@ def app():
         if file_uploader or url_input or user_created_table is not None:
             try:
                 if file_uploader:
-                    file_path = save_uploaded_file(file_uploader, file_uploader.name)
-                    df = pd.read_csv(file_path, encoding='utf-8')
-                    logger.info("data", df)
+                    file_path = uploadFiles.save_uploaded_file(file_uploader, file_uploader.name)
+                    dataframe = pd.read_csv(file_path, encoding='utf-8')
+                    logger.info("data", dataframe)
                 elif url_input:
                     file_path = url_input
-                    df = pd.read_csv(file_path, encoding='utf-8')
-                    logger.info("url", df)
+                    dataframe = pd.read_csv(file_path, encoding='utf-8')
+                    logger.info("url", dataframe)
                 elif user_created_table is not None:
-                    df = user_created_table
-                    logger.info("user created", df)
+                    dataframe = user_created_table
+                    logger.info("user created", dataframe)
                 else:
                     raise ValueError("Nenhuma tabela foi fornecida.")
 
-                df = calculate_iqa(df)
+                df = calculate_iqa(dataframe)
                 st.header("Análise IQA pronta - tabela disponível para download")
                 styled_table = df.style.applymap(color_classificacao, subset=['Classificacao'])
                 st.write(styled_table.to_html(escape=False), unsafe_allow_html=True)
-                st.markdown(get_table_download_link(df), unsafe_allow_html=True)
+                st.markdown(download.get_table_download_link(df), unsafe_allow_html=True)
 
             except (UnicodeDecodeError, ValueError) as e:
                 st.error(str(e))
