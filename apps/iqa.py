@@ -71,83 +71,124 @@ def leng_data(dataframe):
     length = len(dataframe)
     return length
 
+def CTE(dataframe, dtype=np.complex):
+    for column, value_df in zip(dataframe.columns, dataframe.values.T):
+        total_mult = 1
+        if column == 'CTE':
 
-def calculate_iqa(dataframe):
-    # length = leng_data(dataframe)
-    #
-    # for i in range(3):
-    #     total_mult = 0
-    #     print(i)
+            qi_CTE = np.abs(-8.723 * np.log(pd.to_numeric(value_df)) + 88.714)
+            iqa_CTE = np.power(qi_CTE, 0.15)
+            total_mult *= iqa_CTE
+            print(qi_CTE, "CTE", iqa_CTE, total_mult, pd.to_numeric(value_df))
+            return total_mult
 
-        for column, value_df in zip(dataframe.columns, dataframe.values.T):
-                total_mult = 0
-                if column == 'CTE':
-                    qi_CTE = -8.723 * np.log(pd.to_numeric(value_df)) + 88.714
-                    iqa_CTE = qi_CTE ** 0.15
-                    total_mult = total_mult * iqa_CTE
-                    print(qi_CTE, iqa_CTE, total_mult,pd.to_numeric(value_df))
+def PH(dataframe):
+    for column, value_df in zip(dataframe.columns, dataframe.values.T):
+        total_mult = 1
+        if column == 'PH':
+            qi_PH = 93 * np.exp(-(((pd.to_numeric(value_df) - 7.5) ** 2) / 2 * (0.652 ** 2)))
+            iqa_PH = np.power(qi_PH, 0.12)
+            total_mult = total_mult * iqa_PH
+            print(qi_PH, "PH", iqa_PH, total_mult, pd.to_numeric(value_df))
+            return total_mult
 
-                elif column == 'PH':
-                    qi_PH = 93 * np.exp(-(((pd.to_numeric(value_df) - 7.5) ** 2) / 2 * (0.652 ** 2)))
-                    iqa_PH = qi_PH ** 0.12
-                    total_mult = total_mult * iqa_PH
-                    print(qi_PH, iqa_PH, total_mult,pd.to_numeric(value_df))
-
-                elif column == 'DBO':
+def DBO(dataframe):
+  for column, value_df in zip(dataframe.columns, dataframe.values.T):
+                total_mult = 1
+                if column == 'DBO':
                     qi_DBO = -30.1 * np.log(pd.to_numeric(value_df)) + 103.45
-                    iqa_DBO = np.abs(qi_DBO ** 0.1)
+                    # qi_DBO = 2
+                    iqa_DBO = np.power(qi_DBO, 0.1)
                     total_mult = total_mult * iqa_DBO
-                    print(qi_DBO, iqa_DBO, total_mult,pd.to_numeric(value_df))
+                    print(qi_DBO,"DBO", iqa_DBO, total_mult,pd.to_numeric(value_df))
+                    return total_mult
 
-                elif column == 'Turbidez':
-                    qi_Turbidez = -26.45 * np.log(pd.to_numeric(value_df)) + 136.37
-                    iqa_Turbidez = qi_Turbidez ** 0.08
-                    total_mult = total_mult *  iqa_Turbidez
-                    print(qi_Turbidez, iqa_Turbidez, total_mult,pd.to_numeric(value_df))
+def Turbidez(dataframe):
+      for column, value_df in zip(dataframe.columns, dataframe.values.T):
+            total_mult = 1
+            if column == 'Turbidez':
+                qi_Turbidez = -26.45 * np.log(pd.to_numeric(value_df)) + 136.37
+                iqa_Turbidez = qi_Turbidez ** 0.08
+                total_mult = total_mult * iqa_Turbidez
+                print(qi_Turbidez,"Turbidez", iqa_Turbidez, total_mult,pd.to_numeric(value_df))
+                return total_mult
 
-                elif column == 'NT':
+def NT(dataframe):
+          for column, value_df in zip(dataframe.columns, dataframe.values.T):
+                total_mult = 1
+                if column == 'NT':
                     qi_NT = -20.8 * np.log(pd.to_numeric(value_df)) + 93.092
                     iqa_NT = qi_NT ** 0.1
                     total_mult = total_mult *  iqa_NT
-                    print(qi_NT, iqa_NT, total_mult,pd.to_numeric(value_df))
+                    print(qi_NT,"NT", iqa_NT, total_mult,pd.to_numeric(value_df))
+                    return total_mult
 
-                elif column == 'PT':
+def PT(dataframe):
+    for column, value_df in zip(dataframe.columns, dataframe.values.T):
+                total_mult = 1
+                if column == 'PT':
                     qi_PT = -15.49 * np.log(pd.to_numeric(value_df)) + 37.202
                     iqa_PT = qi_PT ** 0.1
                     total_mult = total_mult * iqa_PT
-                    print(qi_PT, iqa_PT, total_mult,pd.to_numeric(value_df))
+                    print(qi_PT,"PT", iqa_PT, total_mult,pd.to_numeric(value_df))
+                    return total_mult
 
-                elif column == 'TEMP':
+
+def TEMP(dataframe):
+    for column, value_df in zip(dataframe.columns, dataframe.values.T):
+                total_mult = 1
+                if column == 'TEMP':
                     qi_TEMP = 92 * np.exp(-(((pd.to_numeric(value_df) - 0) ** 2) / 2 * (0.25 ** 2)))
                     iqa_TEMP = qi_TEMP ** 0.1
                     total_mult = total_mult * iqa_TEMP
-                    print(qi_TEMP, iqa_TEMP, total_mult,pd.to_numeric(value_df))
+                    print(qi_TEMP,"TEMP", iqa_TEMP, total_mult,pd.to_numeric(value_df))
+                    return total_mult
 
-                elif column == 'SOLIDOS':
+
+def SOLIDOS(dataframe):
+    for column, value_df in zip(dataframe.columns, dataframe.values.T):
+                total_mult = 1
+                if column == 'SOLIDOS':
                     qi_SOLIDOS = 80 * np.exp(-(((pd.to_numeric(value_df) - 50) ** 2) / 2 * (0.003 ** 2)))
                     iqa_SOLIDOS = qi_SOLIDOS ** 0.08
                     total_mult = total_mult * iqa_SOLIDOS
-                    print(qi_SOLIDOS, iqa_SOLIDOS, total_mult,pd.to_numeric(value_df))
+                    print(qi_SOLIDOS,"SOLIDOS", iqa_SOLIDOS, total_mult,pd.to_numeric(value_df))
+                    return total_mult
 
-                elif column == 'OD':
+
+def OD(dataframe):
+    for column, value_df in zip(dataframe.columns, dataframe.values.T):
+                total_mult = 1
+                if column == 'OD':
                     qi_OD = 100 * np.exp(-(((pd.to_numeric(value_df) - 100) ** 2) / 2 * (0.025 ** 2)))
                     iqa_OD = qi_OD ** 0.17
                     total_mult = total_mult * iqa_OD
-                    print(qi_OD, iqa_OD, total_mult,pd.to_numeric(value_df))
+                    print(qi_OD,"OD", iqa_OD, total_mult,pd.to_numeric(value_df))
+                    return total_mult
 
-                dataframe["IQA"] = total_mult
+def calculate_iqa(dataframe):
 
-                conditions = [
-                    (dataframe["IQA"] >= 91) & (dataframe["IQA"] <= 100),
-                    (dataframe["IQA"] >= 71) & (dataframe["IQA"] <= 90),
-                    (dataframe["IQA"] >= 51) & (dataframe["IQA"] <= 70),
-                    (dataframe["IQA"] >= 26) & (dataframe["IQA"] <= 50),
-                    (dataframe["IQA"] >= 0) & (dataframe["IQA"] <= 25)
-                ]
+    for i in range(len(dataframe)):
+        # total_mult = 1
+        print(i)
+        print(len(dataframe))
 
-                classifications = ["Otima", "Boa", "Razoavel", "Ruim", "Pessimo"]
 
-                dataframe["Classificacao"] = np.select(conditions, classifications, default=0)
+        dataframe["IQA"] = CTE(dataframe)*PH(dataframe)*DBO(dataframe)*OD(dataframe)*SOLIDOS(dataframe)*TEMP(dataframe)*PT(dataframe)*NT(dataframe)*Turbidez(dataframe)
+        print(dataframe["IQA"][0])
+        print(CTE(dataframe))
+
+        conditions = [
+            (dataframe["IQA"] >= 91) & (dataframe["IQA"] <= 100),
+            (dataframe["IQA"] >= 71) & (dataframe["IQA"] <= 90),
+            (dataframe["IQA"] >= 51) & (dataframe["IQA"] <= 70),
+            (dataframe["IQA"] >= 26) & (dataframe["IQA"] <= 50),
+            (dataframe["IQA"] >= 0) & (dataframe["IQA"] <= 25)
+        ]
+
+        classifications = ["Otima", "Boa", "Razoavel", "Ruim", "Pessimo"]
+
+        dataframe["Classificacao"] = np.select(conditions, classifications, default=0)
 
         return dataframe
 
