@@ -1,18 +1,14 @@
-import streamlit as st
-import pandas as pd
-import math
-import plotly.graph_objects as go
-import base64
+from typing import Dict, Any
 from utils import download
 from utils import uploadFiles
+import base64
+
+import numpy as np
+import pandas as pd
+import streamlit as st
 from loguru import logger
 
 
-def download_template():
-    example = pd.DataFrame(columns=["ID", "Pontos de Coleta", "Número de individuos", "OI Cyanobacteria", "Cyanobacteria - filamentosas", "Índice de Shannon-Wiener"])
-    csv = example.to_csv(index=False)
-    b64 = base64.b64encode(csv.encode()).decode()
-    return f'<a href="data:file/csv;base64,{b64}" download="tabelaTemplate.csv">Download tabelaTemplate.csv</a>'
 
 def create_table():
     st.subheader("Complete a tabela abaixo:")
@@ -27,7 +23,7 @@ def create_table():
         st.session_state.reset_key = 0
 
     default_values = {
-        "ID": "", "Pontos de Coleta": "", "Número de individuos": "", "OI Cyanobacteria": "", "Cyanobacteria - filamentosas": "", "Índice de Shannon-Wiener": ""}
+        "ID": "", "Pontos de Coleta": "", "BPS": "", "BPA": "", "Dietilftalato": "", "Benzofenona": ""}
 
     with st.form(key="table_form"):
         input_data: Dict[Any, Any] = {}
@@ -54,6 +50,7 @@ def create_table():
         dataframe = pd.DataFrame(input_rows)
         st.session_state.user_created_table = dataframe
         st.write(dataframe)
+        return dataframe
     else:
         st.write("Preencha a tabela e clique em 'Criar tabela' para visualizar os dados. ")
 
@@ -61,13 +58,111 @@ def create_table():
         st.session_state.reset_key += 1
         st.experimental_rerun()
 
+def download_template():
+    example = pd.DataFrame(columns=["ID", "Pontos de Coleta", "BPS", "BPA", "Dietilftalato", "Benzofenona"])
+    csv = example.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()
+    return f'<a href="data:file/csv;base64,{b64}" download="tabelaTemplate.csv">Download tabelaTemplate.csv</a>'
+
+
+def leng_data(dataframe):
+    length = len(dataframe)
+    return length
+
+def BPS(dataframe, dtype=np.complex):
+    for column, value_df in zip(dataframe.columns, dataframe.values.T):
+        total_mult = 1
+        if column == 'BPS':
+            =np.abs(1 / (1 + np.power(((LOG($C4) - LOG(C3)) / 0, 4)))
+            qi_CTE = np.abs(-8.723 * np.log(pd.to_numeric(value_df)) + 88.714)
+            iqa_CTE = np.power(qi_CTE, 0.15)
+            total_mult *= iqa_CTE
+            print(qi_CTE, "BPS", iqa_CTE, total_mult, pd.to_numeric(value_df))
+            return total_mult
+
+def BPA(dataframe):
+    for column, value_df in zip(dataframe.columns, dataframe.values.T):
+        total_mult = 1
+        if column == 'BPA':
+            qi_PH = 93 * np.exp(-(((pd.to_numeric(value_df) - 7.5) ** 2) / 2 * (0.652 ** 2)))
+            iqa_PH = np.power(qi_PH, 0.12)
+            total_mult = total_mult * iqa_PH
+            print(qi_PH, "BPA", iqa_PH, total_mult, pd.to_numeric(value_df))
+            return total_mult
+
+def Dietilftalato(dataframe):
+  for column, value_df in zip(dataframe.columns, dataframe.values.T):
+                total_mult = 1
+                if column == 'Dietilftalato':
+                    qi_DBO = -30.1 * np.log(pd.to_numeric(value_df)) + 103.45
+                    # qi_DBO = 2
+                    iqa_DBO = np.power(qi_DBO, 0.1)
+                    total_mult = total_mult * iqa_DBO
+                    print(qi_DBO,"Dietilftalato", iqa_DBO, total_mult,pd.to_numeric(value_df))
+                    return total_mult
+
+def Benzofenona(dataframe):
+      for column, value_df in zip(dataframe.columns, dataframe.values.T):
+            total_mult = 1
+            if column == 'Benzofenona':
+                qi_Turbidez = -26.45 * np.log(pd.to_numeric(value_df)) + 136.37
+                iqa_Turbidez = qi_Turbidez ** 0.08
+                total_mult = total_mult * iqa_Turbidez
+                print(qi_Turbidez,"Benzofenona", iqa_Turbidez, total_mult,pd.to_numeric(value_df))
+                return total_mult
+
+
+def calculate_eco(dataframe):
+
+    for i in range(len(dataframe)):
+        # total_mult = 1
+        print(i)
+        print(len(dataframe))
+
+
+        dataframe["IQA"] = CTE(dataframe)*PH(dataframe)*DBO(dataframe)*OD(dataframe)*SOLIDOS(dataframe)*TEMP(dataframe)*PT(dataframe)*NT(dataframe)*Turbidez(dataframe)
+        print(dataframe["IQA"][0])
+        print(CTE(dataframe))
+
+        conditions = [
+            (dataframe["IQA"] >= 91) & (dataframe["IQA"] <= 100),
+            (dataframe["IQA"] >= 71) & (dataframe["IQA"] <= 90),
+            (dataframe["IQA"] >= 51) & (dataframe["IQA"] <= 70),
+            (dataframe["IQA"] >= 26) & (dataframe["IQA"] <= 50),
+            (dataframe["IQA"] >= 0) & (dataframe["IQA"] <= 25)
+        ]
+
+        classifications = ["Otima", "Boa", "Razoavel", "Ruim", "Pessimo"]
+
+        dataframe["Classificacao"] = np.select(conditions, classifications, default=0)
+
+        return dataframe
+
+
+
+def color_classificacao(val):
+    color = ''
+    if val == 'Otima':
+        color = 'blue'
+    elif val == 'Boa':
+        color = 'green'
+    elif val == 'Razoavel':
+        color = 'yellow'
+    elif val == 'Ruim':
+        color = 'red'
+    elif val == 'Pessimo':
+        color = 'black'
+
+    return f'background-color: {color}'
+
+
 def app():
     """
     A página é criada aqui
     """
-    st.title("Calcular LOE Ecológica")
+    st.title("Calcular IQA")
     st.header("Use APENAS UMA das opções abaixo:")
-    st.write("Use uma opção e então clique no botão 'Processar tabela' no fundo para calcular LOE Ecológica")
+    st.write("Use uma opção e então clique no botão 'Processar tabela' no fundo para calcular IQA")
 
     # URL and file uploader inputs
     url = st.empty()
@@ -98,23 +193,23 @@ def app():
             try:
                 if file_uploader:
                     file_path = uploadFiles.save_uploaded_file(file_uploader, file_uploader.name)
-                    df = pd.read_csv(file_path, encoding='utf-8')
-                    logger.info("data", df)
+                    dataframe = pd.read_csv(file_path, encoding='utf-8')
+                    logger.info("data", dataframe)
                 elif url_input:
                     file_path = url_input
-                    df = pd.read_csv(file_path, encoding='utf-8')
-                    logger.info("url", df)
+                    dataframe = pd.read_csv(file_path, encoding='utf-8')
+                    logger.info("url", dataframe)
                 elif user_created_table is not None:
-                    df = user_created_table
-                    logger.info("user created", df)
+                    dataframe = user_created_table
+                    logger.info("user created", dataframe)
                 else:
                     raise ValueError("Nenhuma tabela foi fornecida.")
-                #
-                # df = calculate_iqa(df)
-                # st.header("Análise IQA pronta - tabela disponível para download")
-                # styled_table = df.style.applymap(color_classificacao, subset=['Classificacao'])
-                # st.write(styled_table.to_html(escape=False), unsafe_allow_html=True)
-                # st.markdown(download.get_table_download_link(df), unsafe_allow_html=True)
+
+                df = calculate_eco(dataframe)
+                st.header("Análise IQA pronta - tabela disponível para download")
+                styled_table = df.style.applymap(color_classificacao, subset=['Classificacao'])
+                st.write(styled_table.to_html(escape=False), unsafe_allow_html=True)
+                st.markdown(download.get_table_download_link(df), unsafe_allow_html=True)
 
             except (UnicodeDecodeError, ValueError) as e:
                 st.error(str(e))
@@ -122,8 +217,6 @@ def app():
                 return
         else:
             st.error("Nenhuma tabela foi fornecida. Por favor, forneça uma tabela.")
-
-
 
 
 #

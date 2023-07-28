@@ -2,16 +2,6 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 from apps import home, iqa, integrado, mapa, ecologica, previsaoIqa
 
-st.title("Home")
-st.markdown(
-    """
-     Neste app, são feitas análises dos dados de uma base de dados provenientes do site dados abertos,
-     onde são armazenados grandes bancos de dados brasileiros e que ficam liberados para todos
-
-     Um exemplo de um banco de dados processado abaixo:
-"""
-)
-
 apps = [
     {"func": home.app, "title": "Home"},
     {"func": iqa.app, "title": "Calcular LOE IQA"},
@@ -46,7 +36,7 @@ with st.sidebar:
          em virtude das variações entre as fórmulas utilizadas para o cálculo, com o intuito de uniformizar a forma de
          cálculo do IQA e tornar os valores comparáveis para todo o território nacional    
  
-        Desenvolvido por Karin de Oliveira e Bruno de Oliveira
+        Desenvolvido por Karin de Oliveira
  
         Código fonte: <https://github.com/karindanoli/NewVersion_Modv>
  
