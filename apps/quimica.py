@@ -23,8 +23,7 @@ def create_table():
         st.session_state.reset_key = 0
 
     default_values = {
-        "ID": "", "Pontos de Coleta": "", "CTE": "", "PH": "", "DBO": "", "Turbidez": "",
-                                    "NT": "", "PT": "", "TEMP": "", "SOLIDOS": "", "OD": ""}
+        "ID": "", "Pontos de Coleta": "","P0_BPS": "", "BPS": "","P0_BPA": "", "BPA": "","P0_Dietilftalato": "", "Dietilftalato": "","P0_Benzofenona": "", "Benzofenona": ""}
 
     with st.form(key="table_form"):
         input_data: Dict[Any, Any] = {}
@@ -60,8 +59,7 @@ def create_table():
         st.experimental_rerun()
 
 def download_template():
-    example = pd.DataFrame(columns=["ID", "Pontos de Coleta", "CTE", "PH", "DBO", "Turbidez",
-                                    "NT", "PT", "TEMP", "SOLIDOS", "OD"])
+    example = pd.DataFrame(columns=["ID", "Pontos de Coleta", "BPS", "BPA", "Dietilftalato", "Benzofenona"])
     csv = example.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()
     return f'<a href="data:file/csv;base64,{b64}" download="tabelaTemplate.csv">Download tabelaTemplate.csv</a>'
@@ -71,122 +69,59 @@ def leng_data(dataframe):
     length = len(dataframe)
     return length
 
-def CTE(dataframe, dtype=np.complex):
+def BPS(dataframe, dtype=np.complex):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-        total_mult = 1
-        if column == 'CTE':
+       if column == 'BPS':
+            result_BPS =1 / (1 + np.exp((np.log(0.1) - np.log(pd.to_numeric(value_df))) / 0.4))
+            result_BPS_final = (result_BPS - 0.1)/(1-0.1)
+            print(result_BPS, "BPS", result_BPS_final,value_df)
+            return result_BPS_final
 
-            qi_CTE = np.abs(-8.723 * np.log(pd.to_numeric(value_df)) + 88.714)
-            iqa_CTE = np.power(qi_CTE, 0.15)
-            total_mult *= iqa_CTE
-            print(qi_CTE, "CTE", iqa_CTE, total_mult, pd.to_numeric(value_df))
-            return total_mult
 
-def PH(dataframe):
+def BPA(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-        total_mult = 1
-        if column == 'PH':
-            qi_PH = 93 * np.exp(-(((pd.to_numeric(value_df) - 7.5) ** 2) / 2 * (0.652 ** 2)))
-            iqa_PH = np.power(qi_PH, 0.12)
-            total_mult = total_mult * iqa_PH
-            print(qi_PH, "PH", iqa_PH, total_mult, pd.to_numeric(value_df))
-            return total_mult
+       if column == 'BPA':
+            result_BPA = 1 / (1 + np.exp((np.log(0.175) - np.log(pd.to_numeric(value_df))) / 0.4))
+            result_BPA_final = (result_BPA - 0.45) / (1 - 0.45)
+            print(result_BPA, "BPA",result_BPA_final,value_df)
+            return result_BPA_final
 
-def DBO(dataframe):
-  for column, value_df in zip(dataframe.columns, dataframe.values.T):
-                total_mult = 1
-                if column == 'DBO':
-                    qi_DBO = -30.1 * np.log(pd.to_numeric(value_df)) + 103.45
-                    # qi_DBO = 2
-                    iqa_DBO = np.power(qi_DBO, 0.1)
-                    total_mult = total_mult * iqa_DBO
-                    print(qi_DBO,"DBO", iqa_DBO, total_mult,pd.to_numeric(value_df))
-                    return total_mult
-
-def Turbidez(dataframe):
-      for column, value_df in zip(dataframe.columns, dataframe.values.T):
-            total_mult = 1
-            if column == 'Turbidez':
-                qi_Turbidez = -26.45 * np.log(pd.to_numeric(value_df)) + 136.37
-                iqa_Turbidez = qi_Turbidez ** 0.08
-                total_mult = total_mult * iqa_Turbidez
-                print(qi_Turbidez,"Turbidez", iqa_Turbidez, total_mult,pd.to_numeric(value_df))
-                return total_mult
-
-def NT(dataframe):
-          for column, value_df in zip(dataframe.columns, dataframe.values.T):
-                total_mult = 1
-                if column == 'NT':
-                    qi_NT = -20.8 * np.log(pd.to_numeric(value_df)) + 93.092
-                    iqa_NT = qi_NT ** 0.1
-                    total_mult = total_mult *  iqa_NT
-                    print(qi_NT,"NT", iqa_NT, total_mult,pd.to_numeric(value_df))
-                    return total_mult
-
-def PT(dataframe):
+def Dietilftalato(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-                total_mult = 1
-                if column == 'PT':
-                    qi_PT = -15.49 * np.log(pd.to_numeric(value_df)) + 37.202
-                    iqa_PT = qi_PT ** 0.1
-                    total_mult = total_mult * iqa_PT
-                    print(qi_PT,"PT", iqa_PT, total_mult,pd.to_numeric(value_df))
-                    return total_mult
+       if column == 'Dietilftalato':
+            result_Dietilftalato = 1 / (1 + np.exp((np.log(5) - np.log(pd.to_numeric(value_df))) / 0.4))
+            result_Dietilftalato_final = (result_Dietilftalato - 0.29) / (1 - 0.29)
+            print(result_Dietilftalato, "Dietilftalato", result_Dietilftalato_final,value_df)
+            return result_Dietilftalato_final
 
-
-def TEMP(dataframe):
+def Benzofenona(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-                total_mult = 1
-                if column == 'TEMP':
-                    qi_TEMP = 92 * np.exp(-(((pd.to_numeric(value_df) - 0) ** 2) / 2 * (0.25 ** 2)))
-                    iqa_TEMP = qi_TEMP ** 0.1
-                    total_mult = total_mult * iqa_TEMP
-                    print(qi_TEMP,"TEMP", iqa_TEMP, total_mult,pd.to_numeric(value_df))
-                    return total_mult
+        if column == 'Benzofenona':
+            result_Benzofenona = 1 / (1 + np.exp((np.log(3) - np.log(pd.to_numeric(value_df))) / 0.4))
+            result_Benzofenona_final = (result_Benzofenona - 0.02) / (1 - 0.02)
+            print(result_Benzofenona, "Benzofenona", result_Benzofenona_final,value_df)
+            return result_Benzofenona_final
 
 
-def SOLIDOS(dataframe):
-    for column, value_df in zip(dataframe.columns, dataframe.values.T):
-                total_mult = 1
-                if column == 'SOLIDOS':
-                    qi_SOLIDOS = 80 * np.exp(-(((pd.to_numeric(value_df) - 50) ** 2) / 2 * (0.003 ** 2)))
-                    iqa_SOLIDOS = qi_SOLIDOS ** 0.08
-                    total_mult = total_mult * iqa_SOLIDOS
-                    print(qi_SOLIDOS,"SOLIDOS", iqa_SOLIDOS, total_mult,pd.to_numeric(value_df))
-                    return total_mult
-
-
-def OD(dataframe):
-    for column, value_df in zip(dataframe.columns, dataframe.values.T):
-                total_mult = 1
-                if column == 'OD':
-                    qi_OD = 100 * np.exp(-(((pd.to_numeric(value_df) - 100) ** 2) / 2 * (0.025 ** 2)))
-                    iqa_OD = qi_OD ** 0.17
-                    total_mult = total_mult * iqa_OD
-                    print(qi_OD,"OD", iqa_OD, total_mult,pd.to_numeric(value_df))
-                    return total_mult
-
-def calculate_iqa(dataframe):
+def calculate_eco(dataframe):
 
     for i in range(len(dataframe)):
-        # total_mult = 1
         print(i)
         print(len(dataframe))
 
 
-        dataframe["IQA"] = CTE(dataframe)*PH(dataframe)*DBO(dataframe)*OD(dataframe)*SOLIDOS(dataframe)*TEMP(dataframe)*PT(dataframe)*NT(dataframe)*Turbidez(dataframe)
-        print(dataframe["IQA"][0])
-        print(CTE(dataframe))
+        dataframe["RISCO"] = 1-((1-BPS(dataframe))*(1-BPA(dataframe))*(1-Dietilftalato(dataframe))*(1-Benzofenona(dataframe)))
+        print(dataframe["RISCO"][0])
+        print(BPA(dataframe))
 
         conditions = [
-            (dataframe["IQA"] >= 91) & (dataframe["IQA"] <= 100),
-            (dataframe["IQA"] >= 71) & (dataframe["IQA"] <= 90),
-            (dataframe["IQA"] >= 51) & (dataframe["IQA"] <= 70),
-            (dataframe["IQA"] >= 26) & (dataframe["IQA"] <= 50),
-            (dataframe["IQA"] >= 0) & (dataframe["IQA"] <= 25)
+            (dataframe["RISCO"] >= 0.76),
+            (dataframe["RISCO"] >= 0.51) & (dataframe["RISCO"] <= 0.75),
+            (dataframe["RISCO"] >= 0.26) & (dataframe["RISCO"] <= 0.50),
+            (dataframe["RISCO"] >= 0) & (dataframe["RISCO"] <= 0.25)
         ]
 
-        classifications = ["Otima", "Boa", "Razoavel", "Ruim", "Pessimo"]
+        classifications = ["inexistente", "moderado", "moderado", "extremo"]
 
         dataframe["Classificacao"] = np.select(conditions, classifications, default=0)
 
@@ -196,16 +131,14 @@ def calculate_iqa(dataframe):
 
 def color_classificacao(val):
     color = ''
-    if val == 'Otima':
+    if val == 'inexistente':
         color = 'blue'
-    elif val == 'Boa':
+    elif val == 'moderado':
         color = 'green'
-    elif val == 'Razoavel':
+    elif val == 'moderado':
         color = 'yellow'
-    elif val == 'Ruim':
+    elif val == 'extremo':
         color = 'red'
-    elif val == 'Pessimo':
-        color = 'black'
 
     return f'background-color: {color}'
 
@@ -214,7 +147,7 @@ def app():
     """
     A página é criada aqui
     """
-    st.title("Calcular IQA")
+    st.title("Calcular loe quimica")
     st.header("Use APENAS UMA das opções abaixo:")
     st.write("Use uma opção e então clique no botão 'Processar tabela' no fundo para calcular IQA")
 
@@ -259,7 +192,7 @@ def app():
                 else:
                     raise ValueError("Nenhuma tabela foi fornecida.")
 
-                df = calculate_iqa(dataframe)
+                df = calculate_eco(dataframe)
                 st.header("Análise IQA pronta - tabela disponível para download")
                 styled_table = df.style.applymap(color_classificacao, subset=['Classificacao'])
                 st.write(styled_table.to_html(escape=False), unsafe_allow_html=True)
@@ -271,3 +204,69 @@ def app():
                 return
         else:
             st.error("Nenhuma tabela foi fornecida. Por favor, forneça uma tabela.")
+
+
+#
+#
+# st.markdown("Explicação sobre o calculo de evidência ecológica")
+#
+# # Cria tabela
+# data = {
+# "Referencia": [10, 957, 50],
+# "Ponto 1": [8, 750, 38],
+# "Ponto 2": [5, 233, 10]
+# }
+#
+# df = pd.DataFrame(data, index=["Taxa (No.)", "Indivíduos (No.)", "Microalgas (%)"])
+#
+#
+# st.table(df)
+#
+# # Coleta valores da tabela
+# ref_values = df["Referencia"]
+# site_a_values = df["Ponto 1"]
+# site_b_values = df["Ponto 2"]
+#
+# # divisão do valor da amostra pelo valor de referência.
+# taxa_a = site_a_values / ref_values
+# taxa_b = site_b_values / ref_values
+#
+# # Calcula o log (R1)
+# log_a = abs(taxa_a.apply(math.log10))
+# log_b = abs(taxa_b.apply(math.log10))
+#
+# # Calcula a soma dos logs e multiplicca por -1
+# result_a = -1 * log_a.sum()
+# result_b = -1 * log_b.sum()
+#
+# # calcula o n para a média
+# num_valores = len(df.columns)
+#
+# # Finaliza a BKX_Triad
+# bkx_triad_a = 1 - math.pow(10, (result_a / num_valores))
+# bkx_triad_b = 1 - math.pow(10, (result_b / num_valores))
+#
+# # Display the results
+# results_data = {
+# "Referencia": [0, 0, 0],
+# "Ponto 1": [0, result_a, bkx_triad_a],
+# "Ponto 2": [0, result_b, bkx_triad_b]
+# }
+#
+# results_df = pd.DataFrame(results_data, index=["Referencia", "Ponto 1", "Ponto 2"])
+# st.table(results_df)
+#
+# # grafico
+# fig = go.Figure()
+# for column in results_df.columns:
+#     fig.add_trace(go.Bar(x=[column], y=[results_df[column][1]], name=column))
+#
+# fig.update_layout(
+#     title="Results",
+#     xaxis_title="Columns",
+#     yaxis_title="Result",
+#     width=600,
+#     height=400
+# )
+#
+# st.plotly_chart(fig)

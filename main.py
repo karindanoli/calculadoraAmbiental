@@ -1,12 +1,13 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from apps import home, iqa, integrado, mapa, ecologica, previsaoIqa
+from apps import home, iqa, integrado, mapa, quimica, previsaoIqa,ecologica
 
 apps = [
     {"func": home.app, "title": "Home"},
     {"func": iqa.app, "title": "Calcular LOE IQA"},
     # {"func": integrado.app, "title": "Integrado"},
     # {"func": mapa.app, "title": "Mapa", "icon": "calculator"},
+    {"func": quimica.app, "title": "Calcular LOE Quimica"},
     {"func": ecologica.app, "title": "Calcular LOE Ecologica"},
     # {"func": previsaoIqa.app, "title": "previsaoIqa"},
 ]
