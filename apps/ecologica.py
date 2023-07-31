@@ -22,8 +22,9 @@ def create_table():
         st.session_state.reset_key = 0
 
     default_values = {
-        "ID": "", "Pontos de Coleta": "", "Controle_Clorella": "", "Chlorella": "", "Controle_Ceriodaphnia": "",
-        "Ceriodaphnia": ""}
+        "ID": "", "Pontos de Coleta": "", "Controle_NumeroIndividuos": "", "NumeroIndividuos": "",
+        "Controle_Cyanobacteria": "", "Cyanobacteria": "",
+        "Controle_filamentosas": "", "filamentosas": "", "Controle_diversidade": "", "diversidade": ""}
 
     with st.form(key="table_form"):
         input_data: Dict[Any, Any] = {}
@@ -60,115 +61,195 @@ def create_table():
 
 
 def download_template():
-    example = pd.DataFrame(
-        columns=["ID", "Pontos de Coleta", "Controle_Clorella", "Chlorella", "Controle_Ceriodaphnia", "Ceriodaphnia"])
+    example = pd.DataFrame(columns=["ID", "Pontos de Coleta", "CTE", "PH", "DBO", "Turbidez",
+                                    "NT", "PT", "TEMP", "SOLIDOS", "OD"])
     csv = example.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()
     return f'<a href="data:file/csv;base64,{b64}" download="tabelaTemplate.csv">Download tabelaTemplate.csv</a>'
 
 
-def R1_Controle_Clorella(dataframe):
+def R1_Controle_NI(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
-        if column == 'Controle_Clorella':
-            r1_controle = (100 - pd.to_numeric(value_df)) / 100
-            return r1_controle
+        if column == 'Controle_NumeroIndividuos':
+            r1_NI_controle = pd.to_numeric(value_df) - R1_Controle_NI(dataframe)
+            return r1_NI_controle
 
 
-def Controle_Clorella(dataframe):
+def Controle_NumeroIndividuos(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
-        if column == 'Controle_Clorella':
-            r1_controle = (100 - pd.to_numeric(value_df)) / 100
-            r2_controle = (r1_controle - pd.to_numeric(value_df)) / (1 - pd.to_numeric(value_df))
-            result_controle = np.log10(1 - r2_controle)
+        if column == 'Controle_NumeroIndividuos':
+            r1_NI_controle = pd.to_numeric(value_df) - R1_Controle_NI(dataframe)
+            print(r1_NI_controle, "NumeroIndividuos", value_df)
+            result_NI_controle = np.log(r1_NI_controle)
 
-            print(r1_controle, "Chlorella", r2_controle, result_controle, pd.to_numeric(value_df))
-            return result_controle
+            print(r1_NI_controle, "NumeroIndividuos", result_NI_controle, pd.to_numeric(value_df))
+            return result_NI_controle
 
 
-def Chlorella(dataframe):
+def NumeroIndividuos(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
-        if column == 'Chlorella':
-            r1_clor = (100 - pd.to_numeric(value_df)) / 100
-            r2_clor = np.abs(np.nan_to_num((r1_clor - R1_Controle_Clorella(dataframe)) / (1 - R1_Controle_Clorella(dataframe))))
-            result_clor = np.abs(np.nan_to_num(np.log10(1 - r2_clor)))
+        if column == 'NumeroIndividuos':
+            r1_NI = pd.to_numeric(value_df) - R1_Controle_NI(dataframe)
+            print(r1_NI, "NumeroIndividuos", value_df)
+            result_NI = np.log(r1_NI)
 
-            print(r1_clor, "Chlorella", r2_clor, result_clor, pd.to_numeric(value_df))
-            return result_clor
+            print(r1_NI, "NumeroIndividuos", result_NI, pd.to_numeric(value_df))
+            return result_NI
 
 
-def R1_Controle_CER(dataframe):
+def R1_Controle_CY(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
-        if column == 'Controle_Ceriodaphnia':
-            r1_controle = (100 - pd.to_numeric(value_df)) / 100
-            return r1_controle
+        if column == 'Controle_Cyanobacteria':
+            r1_CY_controle = pd.to_numeric(value_df) - R1_Controle_CY(dataframe)
+            print(r1_CY_controle, "Controle_Cyanobacteria", value_df)
+            return r1_CY_controle
 
 
-def Controle_CER(dataframe):
+def Controle_Cyanobacteria(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
-        if column == 'Controle_Ceriodaphnia':
-            r1_controle = (100 - pd.to_numeric(value_df)) / 100
-            r2_controle = (r1_controle - pd.to_numeric(value_df)) / (1 - pd.to_numeric(value_df))
-            result_controle = np.log10(1 - r2_controle)
+        if column == 'Controle_Cyanobacteria':
+            r1_CY_controle = pd.to_numeric(value_df) - R1_Controle_CY(dataframe)
+            print(r1_CY_controle, "Controle_Cyanobacteria", value_df)
+            result_CY_controle = np.log(r1_CY_controle)
 
-            print(r1_controle, "Ceriodaphnia", r2_controle, result_controle, pd.to_numeric(value_df))
-            return result_controle
+            print(r1_CY_controle, "Controle_Cyanobacteria", result_CY_controle, pd.to_numeric(value_df))
+            return result_CY_controle
 
 
-def Ceriodaphnia(dataframe):
+def Cyanobacteria(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
-        if column == 'Ceriodaphnia':
-            r1_cer = np.abs(100 - pd.to_numeric(value_df)) / 100
-            print(r1_cer, "CERI", value_df)
-            r2_cer = np.abs(np.nan_to_num((r1_cer - R1_Controle_CER(dataframe)) / (1 - R1_Controle_CER(dataframe))))
-            result_cer = np.abs(np.nan_to_num((np.log10(1 - r2_cer))))
+        if column == 'Cyanobacteria':
+            r1_CY = pd.to_numeric(value_df) - R1_Controle_CY(dataframe)
+            print(r1_CY, "Cyanobacteria", value_df)
+            result_CY = np.log(r1_CY)
 
-            print(r1_cer, "Ceriodaphnia", r2_cer, result_cer, pd.to_numeric(value_df))
-            return result_cer
+            print(r1_CY, "Cyanobacteria", result_CY, pd.to_numeric(value_df))
+            return result_CY
 
 
-def calculate_ecotox(dataframe):
+def R1_Controle_FI(dataframe):
+    for column, value_df in zip(dataframe.columns, dataframe.values.T):
+
+        if column == 'Controle_filamentosas':
+            r1_FI_controle = pd.to_numeric(value_df) - R1_Controle_FI(dataframe)
+            print(r1_FI_controle, "Controle_filamentosas", value_df)
+            return r1_FI_controle
+
+
+def Controle_filamentosas(dataframe):
+    for column, value_df in zip(dataframe.columns, dataframe.values.T):
+
+        if column == 'Controle_filamentosas':
+            r1_FI_controle = pd.to_numeric(value_df) - R1_Controle_FI(dataframe)
+            print(r1_FI_controle, "Controle_filamentosas", value_df)
+            result_FI_controle = np.log(r1_FI_controle)
+
+            print(r1_FI_controle, "Controle_filamentosas", result_FI_controle, pd.to_numeric(value_df))
+            return result_FI_controle
+
+
+def filamentosas(dataframe):
+    for column, value_df in zip(dataframe.columns, dataframe.values.T):
+
+        if column == 'filamentosas':
+            r1_FI = pd.to_numeric(value_df) - R1_Controle_FI(dataframe)
+            print(r1_FI, "filamentosas", value_df)
+            result_FI = np.log(r1_FI)
+
+            print(r1_FI, "filamentosas", result_FI, pd.to_numeric(value_df))
+            return result_FI
+
+
+def riqueza(dataframe):
+    for column, value_df in zip(dataframe.columns, dataframe.values.T):
+
+        if column == 'riqueza':
+            resultado3_riqueza = 1 * (
+                    NumeroIndividuos(dataframe) + Cyanobacteria(dataframe) + filamentosas((dataframe)))
+            result_riqueza = 1 - np.log10(-(resultado3_riqueza) / 3)
+            result2_riqueza = np.log(1 - result_riqueza)
+
+            return result2_riqueza
+
+
+def R1_Controle_Diversidade(dataframe):
+    for column, value_df in zip(dataframe.columns, dataframe.values.T):
+
+        if column == 'Controle_diversidade':
+            r1_diversidade = pd.to_numeric(value_df) - R1_Controle_Diversidade(dataframe)
+            print(r1_diversidade, "Controle_diversidade", value_df)
+            return r1_diversidade
+
+
+def Controle_diversidade(dataframe):
+    for column, value_df in zip(dataframe.columns, dataframe.values.T):
+
+        if column == 'Controle_diversidade':
+            r1_diversidade = pd.to_numeric(value_df) - R1_Controle_Diversidade(dataframe)
+            print(r1_diversidade, "Controle_diversidade", value_df)
+            result_diversidade = np.log(r1_diversidade)
+
+            print(r1_diversidade, "Controle_diversidade", result_diversidade, pd.to_numeric(value_df))
+            return result_diversidade
+
+
+def diversidade(dataframe):
+    for column, value_df in zip(dataframe.columns, dataframe.values.T):
+
+        if column == 'diversidade':
+            r1_diversidade = pd.to_numeric(value_df) - R1_Controle_Diversidade(dataframe)
+            print(r1_diversidade, "diversidade", value_df)
+            r2_diversidade = np.log(r1_diversidade)
+            r3_diversidade = np.abs(r2_diversidade)
+            r4_diversidade = -r3_diversidade / 1
+            r5_diversidade = 1 - np.power(10, r4_diversidade)
+            result_diversidade = np.log(1 - r5_diversidade)
+
+            print(r1_diversidade, "diversidade", result_diversidade, pd.to_numeric(value_df))
+            return result_diversidade
+
+
+def calculate_eco(dataframe):
     for i in range(len(dataframe)):
         print(i)
         print(len(dataframe))
 
-        ceriodaphnia_value = Ceriodaphnia(dataframe)
-        chlorella_value = Chlorella(dataframe)
+        dataframe["RISCO_ECO"] = 1-np.power(10, (diversidade(dataframe) + riqueza(dataframe)) / 2)
+        print(dataframe["RISCO_ECO"][0])
 
-        media_ecotox = np.abs(np.nan_to_num((ceriodaphnia_value + chlorella_value) / 2))
-        dataframe["RISCO_ECOTOX"] = np.abs(np.nan_to_num(1 - np.power(10, media_ecotox)))
-        print(media_ecotox)
-        print(dataframe["RISCO_ECOTOX"][0])
-
-        conditions = [
-            (dataframe["RISCO_ECOTOX"] >= 0.76),
-            (dataframe["RISCO_ECOTOX"] >= 0.51) & (dataframe["RISCO_ECOTOX"] <= 0.75),
-            (dataframe["RISCO_ECOTOX"] >= 0.26) & (dataframe["RISCO_ECOTOX"] <= 0.50),
-            (dataframe["RISCO_ECOTOX"] >= 0) & (dataframe["RISCO_ECOTOX"] <= 0.25)
-        ]
-
-        classifications = ["Baixo", "Moderado", "Alto", "Extremo"]
-
-        dataframe["Classificacao"] = np.select(conditions, classifications, default=0)
+        # conditions = [
+        #     (dataframe["IQA"] >= 91) & (dataframe["IQA"] <= 100),
+        #     (dataframe["IQA"] >= 71) & (dataframe["IQA"] <= 90),
+        #     (dataframe["IQA"] >= 51) & (dataframe["IQA"] <= 70),
+        #     (dataframe["IQA"] >= 26) & (dataframe["IQA"] <= 50),
+        #     (dataframe["IQA"] >= 0) & (dataframe["IQA"] <= 25)
+        # ]
+        #
+        # classifications = ["Otima", "Boa", "Razoavel", "Ruim", "Pessimo"]
+        #
+        # dataframe["Classificacao"] = np.select(conditions, classifications, default=0)
 
         return dataframe
 
 
 def color_classificacao(val):
     color = ''
-    if val == 'Baixo':
+    if val == 'Otima':
         color = 'blue'
-    elif val == 'Moderado':
+    elif val == 'Boa':
         color = 'green'
-    elif val == 'Alto':
+    elif val == 'Razoavel':
         color = 'yellow'
-    elif val == 'Extremo':
+    elif val == 'Ruim':
         color = 'red'
+    elif val == 'Pessimo':
+        color = 'black'
 
     return f'background-color: {color}'
 
@@ -177,7 +258,7 @@ def app():
     """
     A página é criada aqui
     """
-    st.title("Calcular LOE Ecotox")
+    st.title("Calcular IQA")
     st.header("Use APENAS UMA das opções abaixo:")
     st.write("Use uma opção e então clique no botão 'Processar tabela' no fundo para calcular IQA")
 
@@ -222,7 +303,7 @@ def app():
                 else:
                     raise ValueError("Nenhuma tabela foi fornecida.")
 
-                df = calculate_ecotox(dataframe)
+                df = calculate_eco(dataframe)
                 st.header("Análise IQA pronta - tabela disponível para download")
                 styled_table = df.style.applymap(color_classificacao, subset=['Classificacao'])
                 st.write(styled_table.to_html(escape=False), unsafe_allow_html=True)
