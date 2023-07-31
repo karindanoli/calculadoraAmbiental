@@ -9,7 +9,6 @@ import streamlit as st
 from loguru import logger
 
 
-
 def create_table():
     st.subheader("Complete a tabela abaixo:")
     st.write("Valores de coluna são separados por vírgula "
@@ -23,8 +22,8 @@ def create_table():
         st.session_state.reset_key = 0
 
     default_values = {
-        "ID": "", "Pontos de Coleta": "", "CTE": "", "PH": "", "DBO": "", "Turbidez": "",
-                                    "NT": "", "PT": "", "TEMP": "", "SOLIDOS": "", "OD": ""}
+        "ID": "", "Pontos de Coleta": "", "Controle_Clorella": "", "Chlorella": "", "Controle_Ceriodaphnia": "",
+        "Ceriodaphnia": ""}
 
     with st.form(key="table_form"):
         input_data: Dict[Any, Any] = {}
@@ -59,153 +58,117 @@ def create_table():
         st.session_state.reset_key += 1
         st.experimental_rerun()
 
+
 def download_template():
-    example = pd.DataFrame(columns=["ID", "Pontos de Coleta", "CTE", "PH", "DBO", "Turbidez",
-                                    "NT", "PT", "TEMP", "SOLIDOS", "OD"])
+    example = pd.DataFrame(
+        columns=["ID", "Pontos de Coleta", "Controle_Clorella", "Chlorella", "Controle_Ceriodaphnia", "Ceriodaphnia"])
     csv = example.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()
     return f'<a href="data:file/csv;base64,{b64}" download="tabelaTemplate.csv">Download tabelaTemplate.csv</a>'
 
 
-def leng_data(dataframe):
-    length = len(dataframe)
-    return length
-
-def CTE(dataframe, dtype=np.complex):
+def R1_Controle_Clorella(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-        total_mult = 1
-        if column == 'CTE':
 
-            qi_CTE = np.abs(-8.723 * np.log(pd.to_numeric(value_df)) + 88.714)
-            iqa_CTE = np.power(qi_CTE, 0.15)
-            total_mult *= iqa_CTE
-            print(qi_CTE, "CTE", iqa_CTE, total_mult, pd.to_numeric(value_df))
-            return total_mult
+        if column == 'Controle_Clorella':
+            r1_controle = (100 - pd.to_numeric(value_df)) / 100
+            return r1_controle
 
-def PH(dataframe):
+
+def Controle_Clorella(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-        total_mult = 1
-        if column == 'PH':
-            qi_PH = 93 * np.exp(-(((pd.to_numeric(value_df) - 7.5) ** 2) / 2 * (0.652 ** 2)))
-            iqa_PH = np.power(qi_PH, 0.12)
-            total_mult = total_mult * iqa_PH
-            print(qi_PH, "PH", iqa_PH, total_mult, pd.to_numeric(value_df))
-            return total_mult
 
-def DBO(dataframe):
-  for column, value_df in zip(dataframe.columns, dataframe.values.T):
-                total_mult = 1
-                if column == 'DBO':
-                    qi_DBO = -30.1 * np.log(pd.to_numeric(value_df)) + 103.45
-                    # qi_DBO = 2
-                    iqa_DBO = np.power(qi_DBO, 0.1)
-                    total_mult = total_mult * iqa_DBO
-                    print(qi_DBO,"DBO", iqa_DBO, total_mult,pd.to_numeric(value_df))
-                    return total_mult
+        if column == 'Controle_Clorella':
+            r1_controle = (100 - pd.to_numeric(value_df)) / 100
+            r2_controle = (r1_controle - pd.to_numeric(value_df)) / (1 - pd.to_numeric(value_df))
+            result_controle = np.log10(1 - r2_controle)
 
-def Turbidez(dataframe):
-      for column, value_df in zip(dataframe.columns, dataframe.values.T):
-            total_mult = 1
-            if column == 'Turbidez':
-                qi_Turbidez = -26.45 * np.log(pd.to_numeric(value_df)) + 136.37
-                iqa_Turbidez = qi_Turbidez ** 0.08
-                total_mult = total_mult * iqa_Turbidez
-                print(qi_Turbidez,"Turbidez", iqa_Turbidez, total_mult,pd.to_numeric(value_df))
-                return total_mult
+            print(r1_controle, "Chlorella", r2_controle, result_controle, pd.to_numeric(value_df))
+            return result_controle
 
-def NT(dataframe):
-          for column, value_df in zip(dataframe.columns, dataframe.values.T):
-                total_mult = 1
-                if column == 'NT':
-                    qi_NT = -20.8 * np.log(pd.to_numeric(value_df)) + 93.092
-                    iqa_NT = qi_NT ** 0.1
-                    total_mult = total_mult *  iqa_NT
-                    print(qi_NT,"NT", iqa_NT, total_mult,pd.to_numeric(value_df))
-                    return total_mult
 
-def PT(dataframe):
+def Chlorella(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-                total_mult = 1
-                if column == 'PT':
-                    qi_PT = -15.49 * np.log(pd.to_numeric(value_df)) + 37.202
-                    iqa_PT = qi_PT ** 0.1
-                    total_mult = total_mult * iqa_PT
-                    print(qi_PT,"PT", iqa_PT, total_mult,pd.to_numeric(value_df))
-                    return total_mult
+
+        if column == 'Chlorella':
+            r1_clor = (100 - pd.to_numeric(value_df)) / 100
+            r2_clor = np.abs(np.nan_to_num((r1_clor - R1_Controle_Clorella(dataframe)) / (1 - R1_Controle_Clorella(dataframe))))
+            result_clor = np.abs(np.nan_to_num(np.log10(1 - r2_clor)))
+
+            print(r1_clor, "Chlorella", r2_clor, result_clor, pd.to_numeric(value_df))
+            return result_clor
 
 
-def TEMP(dataframe):
+def R1_Controle_CER(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-                total_mult = 1
-                if column == 'TEMP':
-                    qi_TEMP = 92 * np.exp(-(((pd.to_numeric(value_df) - 0) ** 2) / 2 * (0.25 ** 2)))
-                    iqa_TEMP = qi_TEMP ** 0.1
-                    total_mult = total_mult * iqa_TEMP
-                    print(qi_TEMP,"TEMP", iqa_TEMP, total_mult,pd.to_numeric(value_df))
-                    return total_mult
+
+        if column == 'Controle_Ceriodaphnia':
+            r1_controle = (100 - pd.to_numeric(value_df)) / 100
+            return r1_controle
 
 
-def SOLIDOS(dataframe):
+def Controle_CER(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-                total_mult = 1
-                if column == 'SOLIDOS':
-                    qi_SOLIDOS = 80 * np.exp(-(((pd.to_numeric(value_df) - 50) ** 2) / 2 * (0.003 ** 2)))
-                    iqa_SOLIDOS = qi_SOLIDOS ** 0.08
-                    total_mult = total_mult * iqa_SOLIDOS
-                    print(qi_SOLIDOS,"SOLIDOS", iqa_SOLIDOS, total_mult,pd.to_numeric(value_df))
-                    return total_mult
+
+        if column == 'Controle_Ceriodaphnia':
+            r1_controle = (100 - pd.to_numeric(value_df)) / 100
+            r2_controle = (r1_controle - pd.to_numeric(value_df)) / (1 - pd.to_numeric(value_df))
+            result_controle = np.log10(1 - r2_controle)
+
+            print(r1_controle, "Ceriodaphnia", r2_controle, result_controle, pd.to_numeric(value_df))
+            return result_controle
 
 
-def OD(dataframe):
+def Ceriodaphnia(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-                total_mult = 1
-                if column == 'OD':
-                    qi_OD = 100 * np.exp(-(((pd.to_numeric(value_df) - 100) ** 2) / 2 * (0.025 ** 2)))
-                    iqa_OD = qi_OD ** 0.17
-                    total_mult = total_mult * iqa_OD
-                    print(qi_OD,"OD", iqa_OD, total_mult,pd.to_numeric(value_df))
-                    return total_mult
 
-def calculate_iqa(dataframe):
+        if column == 'Ceriodaphnia':
+            r1_cer = np.abs(100 - pd.to_numeric(value_df)) / 100
+            print(r1_cer, "CERI", value_df)
+            r2_cer = np.abs(np.nan_to_num((r1_cer - R1_Controle_CER(dataframe)) / (1 - R1_Controle_CER(dataframe))))
+            result_cer = np.abs(np.nan_to_num((np.log10(1 - r2_cer))))
 
+            print(r1_cer, "Ceriodaphnia", r2_cer, result_cer, pd.to_numeric(value_df))
+            return result_cer
+
+
+def calculate_ecotox(dataframe):
     for i in range(len(dataframe)):
-        # total_mult = 1
         print(i)
         print(len(dataframe))
 
+        ceriodaphnia_value = Ceriodaphnia(dataframe)
+        chlorella_value = Chlorella(dataframe)
 
-        dataframe["IQA"] = CTE(dataframe)*PH(dataframe)*DBO(dataframe)*OD(dataframe)*SOLIDOS(dataframe)*TEMP(dataframe)*PT(dataframe)*NT(dataframe)*Turbidez(dataframe)
-        print(dataframe["IQA"][0])
-        print(CTE(dataframe))
+        media_ecotox = np.abs(np.nan_to_num((ceriodaphnia_value + chlorella_value) / 2))
+        dataframe["RISCO_ECOTOX"] = np.abs(np.nan_to_num(1 - np.power(10, media_ecotox)))
+        print(media_ecotox)
+        print(dataframe["RISCO_ECOTOX"][0])
 
         conditions = [
-            (dataframe["IQA"] >= 91) & (dataframe["IQA"] <= 100),
-            (dataframe["IQA"] >= 71) & (dataframe["IQA"] <= 90),
-            (dataframe["IQA"] >= 51) & (dataframe["IQA"] <= 70),
-            (dataframe["IQA"] >= 26) & (dataframe["IQA"] <= 50),
-            (dataframe["IQA"] >= 0) & (dataframe["IQA"] <= 25)
+            (dataframe["RISCO_ECOTOX"] >= 0.76),
+            (dataframe["RISCO_ECOTOX"] >= 0.51) & (dataframe["RISCO_ECOTOX"] <= 0.75),
+            (dataframe["RISCO_ECOTOX"] >= 0.26) & (dataframe["RISCO_ECOTOX"] <= 0.50),
+            (dataframe["RISCO_ECOTOX"] >= 0) & (dataframe["RISCO_ECOTOX"] <= 0.25)
         ]
 
-        classifications = ["Otima", "Boa", "Razoavel", "Ruim", "Pessimo"]
+        classifications = ["Baixo", "Moderado", "Alto", "Extremo"]
 
         dataframe["Classificacao"] = np.select(conditions, classifications, default=0)
 
         return dataframe
 
 
-
 def color_classificacao(val):
     color = ''
-    if val == 'Otima':
+    if val == 'Baixo':
         color = 'blue'
-    elif val == 'Boa':
+    elif val == 'Moderado':
         color = 'green'
-    elif val == 'Razoavel':
+    elif val == 'Alto':
         color = 'yellow'
-    elif val == 'Ruim':
+    elif val == 'Extremo':
         color = 'red'
-    elif val == 'Pessimo':
-        color = 'black'
 
     return f'background-color: {color}'
 
@@ -214,7 +177,7 @@ def app():
     """
     A página é criada aqui
     """
-    st.title("Calcular IQA")
+    st.title("Calcular LOE Ecotox")
     st.header("Use APENAS UMA das opções abaixo:")
     st.write("Use uma opção e então clique no botão 'Processar tabela' no fundo para calcular IQA")
 
@@ -259,7 +222,7 @@ def app():
                 else:
                     raise ValueError("Nenhuma tabela foi fornecida.")
 
-                df = calculate_iqa(dataframe)
+                df = calculate_ecotox(dataframe)
                 st.header("Análise IQA pronta - tabela disponível para download")
                 styled_table = df.style.applymap(color_classificacao, subset=['Classificacao'])
                 st.write(styled_table.to_html(escape=False), unsafe_allow_html=True)
