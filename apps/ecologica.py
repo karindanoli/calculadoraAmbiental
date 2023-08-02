@@ -24,7 +24,7 @@ def create_table():
     default_values = {
         "ID": "", "Pontos de Coleta": "", "Controle_NumeroIndividuos": "", "NumeroIndividuos": "",
         "Controle_Cyanobacteria": "", "Cyanobacteria": "",
-        "Controle_filamentosas": "", "filamentosas": "", "Controle_diversidade": "", "diversidade": ""}
+        "Controle_filamentosas": "", "filamentosas": "", "Controle_diversidade": "", "diversidade": "",  "riqueza": ""}
 
     with st.form(key="table_form"):
         input_data: Dict[Any, Any] = {}
@@ -68,19 +68,19 @@ def download_template():
     return f'<a href="data:file/csv;base64,{b64}" download="tabelaTemplate.csv">Download tabelaTemplate.csv</a>'
 
 
-def R1_Controle_NI(dataframe):
+def R1_NI_Controle(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
         if column == 'Controle_NumeroIndividuos':
-            r1_NI_controle = pd.to_numeric(value_df) - R1_Controle_NI(dataframe)
-            return r1_NI_controle
+            print("Controle", value_df)
+            return pd.to_numeric(value_df)
 
 
 def Controle_NumeroIndividuos(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
         if column == 'Controle_NumeroIndividuos':
-            r1_NI_controle = pd.to_numeric(value_df) - R1_Controle_NI(dataframe)
+            r1_NI_controle = R1_NI_Controle(dataframe)
             print(r1_NI_controle, "NumeroIndividuos", value_df)
             result_NI_controle = np.log(r1_NI_controle)
 
@@ -92,28 +92,25 @@ def NumeroIndividuos(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
         if column == 'NumeroIndividuos':
-            r1_NI = pd.to_numeric(value_df) - R1_Controle_NI(dataframe)
+            r1_NI = pd.to_numeric(value_df)/R1_NI_Controle(dataframe)
             print(r1_NI, "NumeroIndividuos", value_df)
             result_NI = np.log(r1_NI)
 
             print(r1_NI, "NumeroIndividuos", result_NI, pd.to_numeric(value_df))
             return result_NI
 
-
-def R1_Controle_CY(dataframe):
+def R1_CY_Controle(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
         if column == 'Controle_Cyanobacteria':
-            r1_CY_controle = pd.to_numeric(value_df) - R1_Controle_CY(dataframe)
-            print(r1_CY_controle, "Controle_Cyanobacteria", value_df)
-            return r1_CY_controle
-
+            print("Controle", value_df)
+            return pd.to_numeric(value_df)
 
 def Controle_Cyanobacteria(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
         if column == 'Controle_Cyanobacteria':
-            r1_CY_controle = pd.to_numeric(value_df) - R1_Controle_CY(dataframe)
+            r1_CY_controle = R1_CY_Controle(dataframe)
             print(r1_CY_controle, "Controle_Cyanobacteria", value_df)
             result_CY_controle = np.log(r1_CY_controle)
 
@@ -125,28 +122,26 @@ def Cyanobacteria(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
         if column == 'Cyanobacteria':
-            r1_CY = pd.to_numeric(value_df) - R1_Controle_CY(dataframe)
+            r1_CY = pd.to_numeric(value_df)/R1_CY_Controle(dataframe)
             print(r1_CY, "Cyanobacteria", value_df)
             result_CY = np.log(r1_CY)
 
             print(r1_CY, "Cyanobacteria", result_CY, pd.to_numeric(value_df))
             return result_CY
 
-
-def R1_Controle_FI(dataframe):
+def R1_FI_Controle(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
         if column == 'Controle_filamentosas':
-            r1_FI_controle = pd.to_numeric(value_df) - R1_Controle_FI(dataframe)
-            print(r1_FI_controle, "Controle_filamentosas", value_df)
-            return r1_FI_controle
+            print("Controle", value_df)
+            return pd.to_numeric(value_df)
 
 
 def Controle_filamentosas(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
         if column == 'Controle_filamentosas':
-            r1_FI_controle = pd.to_numeric(value_df) - R1_Controle_FI(dataframe)
+            r1_FI_controle = R1_FI_Controle(dataframe)
             print(r1_FI_controle, "Controle_filamentosas", value_df)
             result_FI_controle = np.log(r1_FI_controle)
 
@@ -158,61 +153,59 @@ def filamentosas(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
         if column == 'filamentosas':
-            r1_FI = pd.to_numeric(value_df) - R1_Controle_FI(dataframe)
-            print(r1_FI, "filamentosas", value_df)
+            r1_FI = pd.to_numeric(value_df)/R1_FI_Controle(dataframe)
             result_FI = np.log(r1_FI)
-
             print(r1_FI, "filamentosas", result_FI, pd.to_numeric(value_df))
             return result_FI
 
 
 def riqueza(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-
         if column == 'riqueza':
             resultado3_riqueza = 1 * (
-                    NumeroIndividuos(dataframe) + Cyanobacteria(dataframe) + filamentosas((dataframe)))
-            result_riqueza = 1 - np.log10(-(resultado3_riqueza) / 3)
+                NumeroIndividuos(dataframe) + Cyanobacteria(dataframe) + filamentosas(dataframe)
+            )
+            # Clip the values to ensure they are positive or above a small epsilon value
+            eps = 1e-9
+            clipped_resultado3 = np.clip(resultado3_riqueza, eps, None)
+
+            # Calculate result_riqueza without using np.log10
+            result_riqueza = 1 - np.log(1 + clipped_resultado3 / 3)
+            #                    é log de 10 tem que consertar
+            # Replace any invalid values (NaN or infinite) with zero
+            result_riqueza = np.nan_to_num(result_riqueza, nan=0, posinf=0, neginf=0)
+
             result2_riqueza = np.log(1 - result_riqueza)
+            if result2_riqueza is not None:
+                return result2_riqueza
 
-            return result2_riqueza
 
-
-def R1_Controle_Diversidade(dataframe):
+def R1_DIVER_Controle(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-
         if column == 'Controle_diversidade':
-            r1_diversidade = pd.to_numeric(value_df) - R1_Controle_Diversidade(dataframe)
-            print(r1_diversidade, "Controle_diversidade", value_df)
-            return r1_diversidade
-
+            print("Controle", value_df)
+            return pd.to_numeric(value_df)
 
 def Controle_diversidade(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-
         if column == 'Controle_diversidade':
-            r1_diversidade = pd.to_numeric(value_df) - R1_Controle_Diversidade(dataframe)
-            print(r1_diversidade, "Controle_diversidade", value_df)
+            r1_diversidade = pd.to_numeric(value_df) / R1_DIVER_Controle(dataframe)
             result_diversidade = np.log(r1_diversidade)
-
             print(r1_diversidade, "Controle_diversidade", result_diversidade, pd.to_numeric(value_df))
-            return result_diversidade
+            if result_diversidade is not None:
+                return result_diversidade
 
 
 def diversidade(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-
         if column == 'diversidade':
-            r1_diversidade = pd.to_numeric(value_df) - R1_Controle_Diversidade(dataframe)
+            r1_diversidade = pd.to_numeric(value_df) / R1_DIVER_Controle(dataframe)
             print(r1_diversidade, "diversidade", value_df)
-            r2_diversidade = np.log(r1_diversidade)
-            r3_diversidade = np.abs(r2_diversidade)
-            r4_diversidade = -r3_diversidade / 1
-            r5_diversidade = 1 - np.power(10, r4_diversidade)
+            r5_diversidade = 1 - np.power(10, -r1_diversidade)
             result_diversidade = np.log(1 - r5_diversidade)
-
             print(r1_diversidade, "diversidade", result_diversidade, pd.to_numeric(value_df))
-            return result_diversidade
+            if result_diversidade is not None:
+                return result_diversidade
 
 
 def calculate_eco(dataframe):
@@ -220,20 +213,27 @@ def calculate_eco(dataframe):
         print(i)
         print(len(dataframe))
 
-        dataframe["RISCO_ECO"] = 1-np.power(10, (diversidade(dataframe) + riqueza(dataframe)) / 2)
-        print(dataframe["RISCO_ECO"][0])
+        diversidade_result = diversidade(dataframe)
+        riqueza_result = riqueza(dataframe)
 
-        # conditions = [
-        #     (dataframe["IQA"] >= 91) & (dataframe["IQA"] <= 100),
-        #     (dataframe["IQA"] >= 71) & (dataframe["IQA"] <= 90),
-        #     (dataframe["IQA"] >= 51) & (dataframe["IQA"] <= 70),
-        #     (dataframe["IQA"] >= 26) & (dataframe["IQA"] <= 50),
-        #     (dataframe["IQA"] >= 0) & (dataframe["IQA"] <= 25)
-        # ]
-        #
-        # classifications = ["Otima", "Boa", "Razoavel", "Ruim", "Pessimo"]
-        #
-        # dataframe["Classificacao"] = np.select(conditions, classifications, default=0)
+        if diversidade_result is not None and riqueza_result is not None:
+            dataframe["RISCO_ECO"] = 1 - np.power(10, (diversidade_result + riqueza_result) / 2)
+            print(dataframe["RISCO_ECO"][0])
+        else:
+            dataframe["RISCO_ECO"] = 0  # Set a default value when the result is None
+            print(dataframe["RISCO_ECO"][0])
+
+        conditions = [
+            (dataframe["RISCO_ECO"] >= 91) & (dataframe["RISCO_ECO"] <= 100),
+            (dataframe["RISCO_ECO"] >= 71) & (dataframe["RISCO_ECO"] <= 90),
+            (dataframe["RISCO_ECO"] >= 51) & (dataframe["RISCO_ECO"] <= 70),
+            (dataframe["RISCO_ECO"] >= 26) & (dataframe["RISCO_ECO"] <= 50),
+            (dataframe["RISCO_ECO"] >= 0) & (dataframe["RISCO_ECO"] <= 25)
+        ]
+
+        classifications = ["Otima", "Boa", "Razoavel", "Ruim", "Pessimo"]
+
+        dataframe["Classificacao"] = np.select(conditions, classifications, default=0)
 
         return dataframe
 
