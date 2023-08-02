@@ -5,7 +5,7 @@ from apps import home, iqa, integrado, mapa, quimica, previsaoIqa,ecotox,ecologi
 apps = [
     {"func": home.app, "title": "Home"},
     {"func": iqa.app, "title": "Calcular LOE IQA"},
-    # {"func": integrado.app, "title": "Integrado"},
+    {"func": integrado.app, "title": "Integrado"},
     # {"func": mapa.app, "title": "Mapa", "icon": "calculator"},
     {"func": quimica.app, "title": "Calcular LOE Quimica"},
     {"func": ecotox.app, "title": "Calcular LOE Ecotox"},

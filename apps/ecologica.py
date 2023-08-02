@@ -9,6 +9,9 @@ import streamlit as st
 from loguru import logger
 
 
+
+
+
 def create_table():
     st.subheader("Complete a tabela abaixo:")
     st.write("Valores de coluna são separados por vírgula "
@@ -206,6 +209,20 @@ def diversidade(dataframe):
             print(r1_diversidade, "diversidade", result_diversidade, pd.to_numeric(value_df))
             if result_diversidade is not None:
                 return result_diversidade
+
+def risco_ecologico(self,dataframe):
+    for i in range(len(dataframe)):
+        diversidade_result = diversidade(dataframe)
+        riqueza_result = riqueza(dataframe)
+
+        if diversidade_result is not None and riqueza_result is not None:
+            dataframe["RISCO_ECO"] = 1 - np.power(10, (diversidade_result + riqueza_result) / 2)
+            print(dataframe["RISCO_ECO"][0])
+        else:
+            dataframe["RISCO_ECO"] = 0  # Set a default value when the result is None
+            print(dataframe["RISCO_ECO"][0])
+
+            return dataframe["RISCO_ECO"]
 
 
 def calculate_eco(dataframe):

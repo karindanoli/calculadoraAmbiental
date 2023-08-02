@@ -103,6 +103,15 @@ def Benzofenona(dataframe):
             return result_Benzofenona_final
 
 
+def risco_quimico(self,dataframe):
+        for i in range(len(dataframe)):
+            print(i)
+            print(len(dataframe))
+
+            dataframe["RISCO"] = 1 - ((1 - BPS(dataframe)) * (1 - BPA(dataframe)) * (1 - Dietilftalato(dataframe)) * (
+                        1 - Benzofenona(dataframe)))
+            return dataframe["RISCO"]
+
 def calculate_eco(dataframe):
 
     for i in range(len(dataframe)):
