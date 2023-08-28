@@ -3,15 +3,33 @@ import math
 import plotly.graph_objects as go
 import numpy as np
 from apps import home, iqa, integrado, mapa, quimica, previsaoIqa,ecotox,ecologica
+from apps.ecologica import risco_ecologico
+from apps.quimica import risco_quimico
+import streamlit as st
+# from streamlit.report_thread import get_report_ctx
+# from streamlit_cache import cache
 
+
+# def get_session_state():
+#     ctx = get_report_ctx()
+#     this_session = st.server.server.Server.get_current()._get_session_info(ctx.session_id).session
+#     return this_session
+#
+# def set_session_state(key, value):
+#     this_session = get_session_state()
+#     this_session.session_state[key] = value
+#
+# def get_saved_session_state(key):
+#     this_session = get_session_state()
+#     return this_session.session_state.get(key, None)
 
 def results(dataframe):
     # Resultados das análises
-    result_page1 = ecologica.risco_ecologico(dataframe)
+    result_page1 = risco_ecologico(dataframe)
     return result_page1
 
 def results2(dataframe):
-    result_page2 = quimica.risco_quimico(dataframe)
+    result_page2 = risco_quimico(dataframe)
     return result_page2
 
 
