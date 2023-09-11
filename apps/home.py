@@ -3,7 +3,6 @@ import streamlit as st
 from apps.iqa import color_classificacao
 
 
-
 def app():
     st.title("Home")
     st.markdown(
@@ -40,4 +39,3 @@ def app():
 
     styled_table = df.style.applymap(color_classificacao, subset=['Classificacao'])
     st.write(styled_table)
-

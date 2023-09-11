@@ -92,7 +92,8 @@ def Chlorella(dataframe):
 
         if column == 'Chlorella':
             r1_clor = (100 - pd.to_numeric(value_df)) / 100
-            r2_clor = np.abs(np.nan_to_num((r1_clor - R1_Controle_Clorella(dataframe)) / (1 - R1_Controle_Clorella(dataframe))))
+            r2_clor = np.abs(np.nan_to_num((r1_clor - R1_Controle_Clorella(dataframe))
+                                           / (1 - R1_Controle_Clorella(dataframe))))
             result_clor = np.abs(np.nan_to_num(np.log10(1 - r2_clor)))
 
             print(r1_clor, "Chlorella", r2_clor, result_clor, pd.to_numeric(value_df))

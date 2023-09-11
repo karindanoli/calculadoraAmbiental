@@ -9,7 +9,6 @@ import streamlit as st
 from loguru import logger
 
 
-
 def create_table():
     st.subheader("Complete a tabela abaixo:")
     st.write("Valores de coluna são separados por vírgula "
@@ -23,7 +22,8 @@ def create_table():
         st.session_state.reset_key = 0
 
     default_values = {
-        "ID": "", "Pontos de Coleta": "","P0_BPS": "", "BPS": "","P0_BPA": "", "BPA": "","P0_Dietilftalato": "", "Dietilftalato": "","P0_Benzofenona": "", "Benzofenona": ""}
+        "ID": "", "Pontos de Coleta": "", "P0_BPS": "", "BPS": "", "P0_BPA": "", "BPA": "", "P0_Dietilftalato": "",
+        "Dietilftalato": "", "P0_Benzofenona": "", "Benzofenona": ""}
 
     with st.form(key="table_form"):
         input_data: Dict[Any, Any] = {}
@@ -58,6 +58,7 @@ def create_table():
         st.session_state.reset_key += 1
         st.experimental_rerun()
 
+
 def download_template():
     example = pd.DataFrame(columns=["ID", "Pontos de Coleta", "BPS", "BPA", "Dietilftalato", "Benzofenona"])
     csv = example.to_csv(index=False)
@@ -69,57 +70,60 @@ def leng_data(dataframe):
     length = len(dataframe)
     return length
 
-def BPS(dataframe, dtype=np.complex):
+
+def BPS(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-       if column == 'BPS':
-            result_BPS =1 / (1 + np.exp((np.log(0.1) - np.log(pd.to_numeric(value_df))) / 0.4))
-            result_BPS_final = (result_BPS - 0.1)/(1-0.1)
-            print(result_BPS, "BPS", result_BPS_final,value_df)
+        if column == 'BPS':
+            result_BPS = 1 / (1 + np.exp((np.log(0.1) - np.log(pd.to_numeric(value_df))) / 0.4))
+            result_BPS_final = (result_BPS - 0.1) / (1 - 0.1)
+            print(result_BPS, "BPS", result_BPS_final, value_df)
             return result_BPS_final
 
 
 def BPA(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-       if column == 'BPA':
+        if column == 'BPA':
             result_BPA = 1 / (1 + np.exp((np.log(0.175) - np.log(pd.to_numeric(value_df))) / 0.4))
             result_BPA_final = (result_BPA - 0.45) / (1 - 0.45)
-            print(result_BPA, "BPA",result_BPA_final,value_df)
+            print(result_BPA, "BPA", result_BPA_final, value_df)
             return result_BPA_final
+
 
 def Dietilftalato(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
-       if column == 'Dietilftalato':
+        if column == 'Dietilftalato':
             result_Dietilftalato = 1 / (1 + np.exp((np.log(5) - np.log(pd.to_numeric(value_df))) / 0.4))
             result_Dietilftalato_final = (result_Dietilftalato - 0.29) / (1 - 0.29)
-            print(result_Dietilftalato, "Dietilftalato", result_Dietilftalato_final,value_df)
+            print(result_Dietilftalato, "Dietilftalato", result_Dietilftalato_final, value_df)
             return result_Dietilftalato_final
+
 
 def Benzofenona(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
         if column == 'Benzofenona':
             result_Benzofenona = 1 / (1 + np.exp((np.log(3) - np.log(pd.to_numeric(value_df))) / 0.4))
             result_Benzofenona_final = (result_Benzofenona - 0.02) / (1 - 0.02)
-            print(result_Benzofenona, "Benzofenona", result_Benzofenona_final,value_df)
+            print(result_Benzofenona, "Benzofenona", result_Benzofenona_final, value_df)
             return result_Benzofenona_final
 
 
-def risco_quimico(self,dataframe):
-        for i in range(len(dataframe)):
-            print(i)
-            print(len(dataframe))
-
-            dataframe["RISCO"] = 1 - ((1 - BPS(dataframe)) * (1 - BPA(dataframe)) * (1 - Dietilftalato(dataframe)) * (
-                        1 - Benzofenona(dataframe)))
-            return dataframe["RISCO"]
-
-def calculate_eco(dataframe):
-
+def risco_quimico(dataframe):
     for i in range(len(dataframe)):
         print(i)
         print(len(dataframe))
 
+        dataframe["RISCO"] = 1 - ((1 - BPS(dataframe)) * (1 - BPA(dataframe)) * (1 - Dietilftalato(dataframe)) * (
+                1 - Benzofenona(dataframe)))
+        return dataframe["RISCO"]
 
-        dataframe["RISCO"] = 1-((1-BPS(dataframe))*(1-BPA(dataframe))*(1-Dietilftalato(dataframe))*(1-Benzofenona(dataframe)))
+
+def calculate_eco(dataframe):
+    for i in range(len(dataframe)):
+        print(i)
+        print(len(dataframe))
+
+        dataframe["RISCO"] = 1 - ((1 - BPS(dataframe)) * (1 - BPA(dataframe)) * (1 - Dietilftalato(dataframe)) * (
+                    1 - Benzofenona(dataframe)))
         print(dataframe["RISCO"][0])
         print(BPA(dataframe))
 
@@ -135,7 +139,6 @@ def calculate_eco(dataframe):
         dataframe["Classificacao"] = np.select(conditions, classifications, default=0)
 
         return dataframe
-
 
 
 def color_classificacao(val):
@@ -213,7 +216,6 @@ def app():
                 return
         else:
             st.error("Nenhuma tabela foi fornecida. Por favor, forneça uma tabela.")
-
 
 #
 #

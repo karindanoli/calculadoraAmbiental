@@ -9,9 +9,6 @@ import streamlit as st
 from loguru import logger
 
 
-
-
-
 def create_table():
     st.subheader("Complete a tabela abaixo:")
     st.write("Valores de coluna são separados por vírgula "
@@ -27,7 +24,7 @@ def create_table():
     default_values = {
         "ID": "", "Pontos de Coleta": "", "Controle_NumeroIndividuos": "", "NumeroIndividuos": "",
         "Controle_Cyanobacteria": "", "Cyanobacteria": "",
-        "Controle_filamentosas": "", "filamentosas": "", "Controle_diversidade": "", "diversidade": "",  "riqueza": ""}
+        "Controle_filamentosas": "", "filamentosas": "", "Controle_diversidade": "", "diversidade": "", "riqueza": ""}
 
     with st.form(key="table_form"):
         input_data: Dict[Any, Any] = {}
@@ -95,12 +92,13 @@ def NumeroIndividuos(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
         if column == 'NumeroIndividuos':
-            r1_NI = pd.to_numeric(value_df)/R1_NI_Controle(dataframe)
+            r1_NI = pd.to_numeric(value_df) / R1_NI_Controle(dataframe)
             print(r1_NI, "NumeroIndividuos", value_df)
             result_NI = np.log(r1_NI)
 
             print(r1_NI, "NumeroIndividuos", result_NI, pd.to_numeric(value_df))
             return result_NI
+
 
 def R1_CY_Controle(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
@@ -108,6 +106,7 @@ def R1_CY_Controle(dataframe):
         if column == 'Controle_Cyanobacteria':
             print("Controle", value_df)
             return pd.to_numeric(value_df)
+
 
 def Controle_Cyanobacteria(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
@@ -125,12 +124,13 @@ def Cyanobacteria(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
         if column == 'Cyanobacteria':
-            r1_CY = pd.to_numeric(value_df)/R1_CY_Controle(dataframe)
+            r1_CY = pd.to_numeric(value_df) / R1_CY_Controle(dataframe)
             print(r1_CY, "Cyanobacteria", value_df)
             result_CY = np.log(r1_CY)
 
             print(r1_CY, "Cyanobacteria", result_CY, pd.to_numeric(value_df))
             return result_CY
+
 
 def R1_FI_Controle(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
@@ -156,7 +156,7 @@ def filamentosas(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
         if column == 'filamentosas':
-            r1_FI = pd.to_numeric(value_df)/R1_FI_Controle(dataframe)
+            r1_FI = pd.to_numeric(value_df) / R1_FI_Controle(dataframe)
             result_FI = np.log(r1_FI)
             print(r1_FI, "filamentosas", result_FI, pd.to_numeric(value_df))
             return result_FI
@@ -166,7 +166,7 @@ def riqueza(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
         if column == 'riqueza':
             resultado3_riqueza = 1 * (
-                NumeroIndividuos(dataframe) + Cyanobacteria(dataframe) + filamentosas(dataframe)
+                    NumeroIndividuos(dataframe) + Cyanobacteria(dataframe) + filamentosas(dataframe)
             )
             # Clip the values to ensure they are positive or above a small epsilon value
             eps = 1e-9
@@ -189,6 +189,7 @@ def R1_DIVER_Controle(dataframe):
             print("Controle", value_df)
             return pd.to_numeric(value_df)
 
+
 def Controle_diversidade(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
         if column == 'Controle_diversidade':
@@ -210,7 +211,8 @@ def diversidade(dataframe):
             if result_diversidade is not None:
                 return result_diversidade
 
-def risco_ecologico(self,dataframe):
+
+def risco_ecologico(dataframe):
     for i in range(len(dataframe)):
         diversidade_result = diversidade(dataframe)
         riqueza_result = riqueza(dataframe)

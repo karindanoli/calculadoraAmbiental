@@ -3,7 +3,6 @@ import tempfile
 import uuid
 
 
-
 def save_uploaded_file(file_content, file_name):
     """
     Salva o arquivo que foi subido para um diretório temporário
@@ -17,5 +16,3 @@ def save_uploaded_file(file_content, file_name):
         file.write(file_content.getbuffer())
 
     return file_path
-
-

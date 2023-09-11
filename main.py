@@ -1,6 +1,7 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from apps import home, iqa, integrado, mapa, quimica, previsaoIqa,ecotox,ecologica
+
+from apps import home, iqa, integrado, quimica, ecotox, ecologica
 
 apps = [
     {"func": home.app, "title": "Home"},

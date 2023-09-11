@@ -1,11 +1,11 @@
-import streamlit as st
-import math
-import plotly.graph_objects as go
 import numpy as np
-from apps import home, iqa, integrado, mapa, quimica, previsaoIqa,ecotox,ecologica
+import plotly.graph_objects as go
+import streamlit as st
+
 from apps.ecologica import risco_ecologico
 from apps.quimica import risco_quimico
-import streamlit as st
+
+
 # from streamlit.report_thread import get_report_ctx
 # from streamlit_cache import cache
 
@@ -28,83 +28,83 @@ def results(dataframe):
     result_page1 = risco_ecologico(dataframe)
     return result_page1
 
+
 def results2(dataframe):
     result_page2 = risco_quimico(dataframe)
     return result_page2
 
 
 def app():
-        st.title("Análise integrada")
-        st.markdown("Explicação sobre o calculo de análise integrada")
+    st.title("Análise integrada")
+    st.markdown("Explicação sobre o calculo de análise integrada")
 
-        print(results)
-        print(results2)
+    print(results)
+    print(results2)
 
-        # Log dos resultados
-        log_result_page1 = np.log10(1 - results)
+    # TODO valor placeholder. Consertar erro onde se user n tem dataframe, causa erro
+    # Log dos resultados
+    log_result_page1 = np.log10(2 - 1)
 
-        R1 = 1 - log_result_page1
+    R1 = 1 - log_result_page1
 
-        log_result_page2 = np.log10(1 - results2)
-        R2 = 1 - log_result_page2
+    log_result_page2 = np.log10(2 - 1)
+    R2 = 1 - log_result_page2
 
-        # Valores fixos vindos de JENSEN & MESMAN, 2006
-        B = 1.5
-        C = 2
+    # Valores fixos vindos de JENSEN & MESMAN, 2006
+    B = 1.5
+    C = 2
 
-        R = (R1 * B + R2 * C) / (B + C)
+    R = (R1 * B + R2 * C) / (B + C)
 
-        # Categorias de risco
-        risk_category = ""
-        if 0 <= R <= 0.25:
-            risk_category = "Risco baixo"
-        elif 0.25 < R <= 0.5:
-            risk_category = "Risco moderado"
-        elif 0.5 < R <= 0.75:
-            risk_category = "Risco alto"
-        elif R > 0.75:
-            risk_category = "Risco altissímo"
+    # Categorias de risco
+    risk_category = ""
+    if 0 <= R <= 0.25:
+        risk_category = "Risco baixo"
+    elif 0.25 < R <= 0.5:
+        risk_category = "Risco moderado"
+    elif 0.5 < R <= 0.75:
+        risk_category = "Risco alto"
+    elif R > 0.75:
+        risk_category = "Risco altissímo"
 
-        # Resultado
-        st.subheader("Result")
-        st.text(f"R = {R:.2f}")
-        st.text("Risk Category: " + risk_category)
+    # Resultado
+    st.subheader("Result")
+    st.text(f"R = {R:.2f}")
+    st.text("Risk Category: " + risk_category)
 
-        # Grafico gauge
-        fig = go.Figure(go.Indicator(
-            mode="gauge+number",
-            value=R,
-            domain={'x': [0, 1], 'y': [0, 1]},
-            gauge={
-                'axis': {'range': [0, 1]},
-                'bar': {'color': "darkblue"},
-                'steps': [
-                    {'range': [0, 0.25], 'color': 'green'},
-                    {'range': [0.25, 0.5], 'color': 'yellow'},
-                    {'range': [0.5, 0.75], 'color': 'orange'},
-                    {'range': [0.75, 1], 'color': 'red'}
-                ],
-                'threshold': {
-                    'line': {'color': "red", 'width': 4},
-                    'thickness': 0.75,
-                    'value': R
-                }
+    # Grafico gauge
+    fig = go.Figure(go.Indicator(
+        mode="gauge+number",
+        value=R,
+        domain={'x': [0, 1], 'y': [0, 1]},
+        gauge={
+            'axis': {'range': [0, 1]},
+            'bar': {'color': "darkblue"},
+            'steps': [
+                {'range': [0, 0.25], 'color': 'green'},
+                {'range': [0.25, 0.5], 'color': 'yellow'},
+                {'range': [0.5, 0.75], 'color': 'orange'},
+                {'range': [0.75, 1], 'color': 'red'}
+            ],
+            'threshold': {
+                'line': {'color': "red", 'width': 4},
+                'thickness': 0.75,
+                'value': R
             }
-        ))
+        }
+    ))
 
+    fig.update_layout(
+        title_text="Risk Level",
+        width=400,
+        height=300,
+    )
 
-        fig.update_layout(
-            title_text="Risk Level",
-            width=400,
-            height=300,
-        )
+    st.plotly_chart(fig)
 
-
-        st.plotly_chart(fig)
-
-        # legenda
-        st.markdown("""O cálculo é baseado na análise integrada da ARE, onde R é o resultado. Os niveís de risco:""")
-        st.markdown("""0 <= R <= 0.25 - Risco baixo - verde""")
-        st.markdown("""0.25 < R <= 0.5 - Risco moderado - amarelo""")
-        st.markdown("""0.5 < R <= 0.75 - Risco alto - laranja""")
-        st.markdown("""R > 0.75 - Risco altissímo - vermelho""")
+    # legenda
+    st.markdown("""O cálculo é baseado na análise integrada da ARE, onde R é o resultado. Os niveís de risco:""")
+    st.markdown("""0 <= R <= 0.25 - Risco baixo - verde""")
+    st.markdown("""0.25 < R <= 0.5 - Risco moderado - amarelo""")
+    st.markdown("""0.5 < R <= 0.75 - Risco alto - laranja""")
+    st.markdown("""R > 0.75 - Risco altissímo - vermelho""")
