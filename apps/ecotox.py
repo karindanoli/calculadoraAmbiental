@@ -15,7 +15,7 @@ def create_table():
              "(E.g: se preencher o ID com os valores 1,2, "
              "a tabela terá o valor 1 na col 1 e 2 na col 2)")
     st.write("ATENÇÃO: Não coloque espaço entre vírgulas(E.g: 1, 2)")
-    st.write("Preencha todos os campos, o cálculo IQA só será correto com todos os valores")
+    st.write("Preencha todos os campos, o cálculo só será correto com todos os valores")
     st.write("Use somente valores alfanuméricos (A-Z,0-9)")
 
     if 'reset_key' not in st.session_state:
@@ -157,6 +157,10 @@ def calculate_ecotox(dataframe):
 
         dataframe["Classificacao"] = np.select(conditions, classifications, default=0)
 
+        # Store the final result in session state
+        final_result_ecotox = np.mean(dataframe["RISCO_ECOTOX"])
+        st.session_state.final_result_ecotox = final_result_ecotox
+
         return dataframe
 
 
@@ -224,7 +228,7 @@ def app():
                     raise ValueError("Nenhuma tabela foi fornecida.")
 
                 df = calculate_ecotox(dataframe)
-                st.header("Análise IQA pronta - tabela disponível para download")
+                st.header("Análise pronta - tabela disponível para download")
                 styled_table = df.style.applymap(color_classificacao, subset=['Classificacao'])
                 st.write(styled_table.to_html(escape=False), unsafe_allow_html=True)
                 st.markdown(download.get_table_download_link(df), unsafe_allow_html=True)

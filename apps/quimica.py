@@ -15,7 +15,7 @@ def create_table():
              "(E.g: se preencher o ID com os valores 1,2, "
              "a tabela terá o valor 1 na col 1 e 2 na col 2)")
     st.write("ATENÇÃO: Não coloque espaço entre vírgulas(E.g: 1, 2)")
-    st.write("Preencha todos os campos, o cálculo IQA só será correto com todos os valores")
+    st.write("Preencha todos os campos, o cálculo só será correto com todos os valores")
     st.write("Use somente valores alfanuméricos (A-Z,0-9)")
 
     if 'reset_key' not in st.session_state:
@@ -137,6 +137,9 @@ def calculate_eco(dataframe):
         classifications = ["inexistente", "moderado", "moderado", "extremo"]
 
         dataframe["Classificacao"] = np.select(conditions, classifications, default=0)
+
+        final_result_quimica = np.mean(dataframe["RISCO"])
+        st.session_state.final_result_quimica = final_result_quimica
 
         return dataframe
 

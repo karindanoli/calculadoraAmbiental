@@ -1,27 +1,10 @@
 import numpy as np
 import plotly.graph_objects as go
+import streamlit
 import streamlit as st
 
 from apps.ecologica import risco_ecologico
 from apps.quimica import risco_quimico
-
-
-# from streamlit.report_thread import get_report_ctx
-# from streamlit_cache import cache
-
-
-# def get_session_state():
-#     ctx = get_report_ctx()
-#     this_session = st.server.server.Server.get_current()._get_session_info(ctx.session_id).session
-#     return this_session
-#
-# def set_session_state(key, value):
-#     this_session = get_session_state()
-#     this_session.session_state[key] = value
-#
-# def get_saved_session_state(key):
-#     this_session = get_session_state()
-#     return this_session.session_state.get(key, None)
 
 def results(dataframe):
     # Resultados das análises
@@ -38,10 +21,17 @@ def app():
     st.title("Análise integrada")
     st.markdown("Explicação sobre o calculo de análise integrada")
 
-    print(results)
-    print(results2)
+    final_result_eco = streamlit.session_state.get('final_result_eco')
+    final_result_ecotox = streamlit.session_state.get('final_result_ecotox')
+    final_result_quimica = streamlit.session_state.get('final_result_quimica')
+    final_result_iqa = streamlit.session_state.get('final_result_iqa')
 
-    # TODO valor placeholder. Consertar erro onde se user n tem dataframe, causa erro
+    st.text("Final Result - Ecologica: " + str(final_result_eco))
+    st.text("Final Result - Ecotox: " + str(final_result_ecotox))
+    st.text("Final Result - quimica: " + str(final_result_quimica))
+    st.text("Final Result - iqa: " + str(final_result_iqa))
+
+    # TODO valor placeholder. fazer o programa ler o resultado final
     # Log dos resultados
     log_result_page1 = np.log10(2 - 1)
 

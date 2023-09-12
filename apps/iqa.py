@@ -195,6 +195,9 @@ def calculate_iqa(dataframe):
 
         dataframe["Classificacao"] = np.select(conditions, classifications, default=0)
 
+        final_result_iqa = np.mean(dataframe["IQA"])
+        st.session_state.final_result_iqa = final_result_iqa
+
         return dataframe
 
 
