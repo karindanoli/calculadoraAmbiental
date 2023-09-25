@@ -6,6 +6,7 @@ import streamlit as st
 from apps.ecologica import risco_ecologico
 from apps.quimica import risco_quimico
 
+
 def results(dataframe):
     # Resultados das análises
     result_page1 = risco_ecologico(dataframe)
