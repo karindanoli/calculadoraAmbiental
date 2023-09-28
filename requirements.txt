@@ -168,6 +168,3 @@ leafmap~=0.18.8
 localtileserver
 nbserverproxy
 streamlit~=1.20.0
-pandas~=1.5.3
-loguru~=0.6.0
-imbalanced_learn==0.10.1
