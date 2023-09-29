@@ -1,7 +1,7 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 
-from apps import home, iqa, integrado, quimica, ecotox, ecologica
+from apps import home, iqa, integrado, quimica, ecotox, ecologica, previsaoIqa
 
 apps = [
     {"func": home.app, "title": "Home"},
@@ -11,7 +11,7 @@ apps = [
     {"func": quimica.app, "title": "Calcular LOE Quimica"},
     {"func": ecotox.app, "title": "Calcular LOE Ecotox"},
     {"func": ecologica.app, "title": "Calcular LOE Ecologica"},
-    # {"func": previsaoIqa.app, "title": "previsaoIqa"},
+    {"func": previsaoIqa.app, "title": "previsaoIqa"},
 ]
 
 titles = [app["title"] for app in apps]
