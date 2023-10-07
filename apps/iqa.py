@@ -79,7 +79,7 @@ def CTE(dataframe):
             qi_CTE = np.abs(-8.723 * np.log(pd.to_numeric(value_df)) + 88.714)
             iqa_CTE = np.power(qi_CTE, 0.15)
             total_mult *= iqa_CTE
-            print(qi_CTE, "CTE", iqa_CTE, total_mult, pd.to_numeric(value_df))
+            print("CTE", qi_CTE, "qi_CTE", iqa_CTE, "iqa_CTE", total_mult, "total_mult", pd.to_numeric(value_df), "valor que chegou")
             return total_mult
 
 
@@ -90,20 +90,26 @@ def PH(dataframe):
             qi_PH = 93 * np.exp(-(((pd.to_numeric(value_df) - 7.5) ** 2) / 2 * (0.652 ** 2)))
             iqa_PH = np.power(qi_PH, 0.12)
             total_mult = total_mult * iqa_PH
-            print(qi_PH, "PH", iqa_PH, total_mult, pd.to_numeric(value_df))
+            print("PH", qi_PH, "qi_PH", iqa_PH, "iqa_PH", total_mult, "total_mult", pd.to_numeric(value_df), "valor que chegou", dataframe.values.T)
             return total_mult
 
 
 def DBO(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
         total_mult = 1
-        if column == 'DBO':
-            qi_DBO = -30.1 * np.log(pd.to_numeric(value_df)) + 103.45
-            # qi_DBO = 2
-            iqa_DBO = np.power(qi_DBO, 0.1)
-            total_mult = total_mult * iqa_DBO
-            print(qi_DBO, "DBO", iqa_DBO, total_mult, pd.to_numeric(value_df))
-            return total_mult
+        # if column == 'DBO' and (pd.to_numeric(value_df) >= 30).any():
+        #
+        #     # qi_DBO =  -30.1 * np.log(pd.to_numeric(value_df)) + 103.45
+        #
+        #         iqa_DBO = np.power(-30.1 * np.log(pd.to_numeric(value_df)) + 103.45, 0.1)
+        #         total_mult = total_mult * iqa_DBO
+        #         print("DBO", iqa_DBO, "iqa_DBO", total_mult, "total_mult", pd.to_numeric(value_df), "valor que chegou")
+        #         return total_mult
+        if column == 'DBO' and (pd.to_numeric(value_df) >= 30).any():
+                iqa_DBO = np.power(2 + 103.45, 0.1)
+                total_mult = total_mult * iqa_DBO
+                print("DBO",  iqa_DBO, "iqa_DBO", total_mult, "total_mult", pd.to_numeric(value_df),  "valor que chegou")
+                return total_mult
 
 
 def Turbidez(dataframe):
@@ -175,8 +181,8 @@ def OD(dataframe):
 def calculate_iqa(dataframe):
     for i in range(len(dataframe)):
         # total_mult = 1
-        print(i)
-        print(len(dataframe))
+        print(i, "laço")
+        print(len(dataframe), "tamanho do dataframe")
 
         dataframe["IQA"] = CTE(dataframe) * PH(dataframe) * DBO(dataframe) * OD(dataframe) * SOLIDOS(dataframe) * TEMP(
             dataframe) * PT(dataframe) * NT(dataframe) * Turbidez(dataframe)
@@ -204,7 +210,7 @@ def calculate_iqa(dataframe):
 def color_classificacao(val):
     color = ''
     if val == 'Otima':
-        color = 'blue'
+        color = 'white'
     elif val == 'Boa':
         color = 'green'
     elif val == 'Razoavel':
@@ -212,7 +218,7 @@ def color_classificacao(val):
     elif val == 'Ruim':
         color = 'red'
     elif val == 'Pessimo':
-        color = 'black'
+        color = 'white'
 
     return f'background-color: {color}'
 
