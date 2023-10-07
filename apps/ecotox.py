@@ -80,10 +80,10 @@ def Controle_Clorella(dataframe):
 
         if column == 'Controle_Clorella':
             r1_controle = (100 - pd.to_numeric(value_df)) / 100
-            r2_controle = (r1_controle - pd.to_numeric(value_df)) / (1 - pd.to_numeric(value_df))
+            r2_controle = (r1_controle - r1_controle) / (1 - r1_controle)
             result_controle = np.log10(1 - r2_controle)
 
-            print(r1_controle, "Chlorella", r2_controle, result_controle, pd.to_numeric(value_df))
+            print("controle Chlorella", r1_controle, "r1 controle", r2_controle, "r2 controle", result_controle, "result control", pd.to_numeric(value_df), "valor que chegou")
             return result_controle
 
 
@@ -91,12 +91,13 @@ def Chlorella(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
         if column == 'Chlorella':
+            metodo_r1controlella = R1_Controle_Clorella(dataframe)
             r1_clor = (100 - pd.to_numeric(value_df)) / 100
-            r2_clor = np.abs(np.nan_to_num((r1_clor - R1_Controle_Clorella(dataframe))
-                                           / (1 - R1_Controle_Clorella(dataframe))))
-            result_clor = np.abs(np.nan_to_num(np.log10(1 - r2_clor)))
+            r2_clor = np.nan_to_num((r1_clor - metodo_r1controlella)
+                                           / (1 - metodo_r1controlella))
+            result_clor = np.nan_to_num(np.log10(1 - r2_clor))
 
-            print(r1_clor, "Chlorella", r2_clor, result_clor, pd.to_numeric(value_df))
+            print("Chlorella", r1_clor, "r1 core",  r2_clor, "r2 core", result_clor, "result control", pd.to_numeric(value_df), "valor que chegou",  metodo_r1controlella, "metodo r1 controle")
             return result_clor
 
 
@@ -112,11 +113,11 @@ def Controle_CER(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
         if column == 'Controle_Ceriodaphnia':
-            r1_controle = (100 - pd.to_numeric(value_df)) / 100
-            r2_controle = (r1_controle - pd.to_numeric(value_df)) / (1 - pd.to_numeric(value_df))
+            r1_controle = ((100 - pd.to_numeric(value_df)) / 100)
+            r2_controle = (r1_controle - r1_controle) / (1 - r1_controle)
             result_controle = np.log10(1 - r2_controle)
 
-            print(r1_controle, "Ceriodaphnia", r2_controle, result_controle, pd.to_numeric(value_df))
+            print("Ceriodaphnia controle", r1_controle, "r1 controle", r2_controle, "r2 controle", result_controle, "result control", pd.to_numeric(value_df), "valor que chegou")
             return result_controle
 
 
@@ -124,12 +125,11 @@ def Ceriodaphnia(dataframe):
     for column, value_df in zip(dataframe.columns, dataframe.values.T):
 
         if column == 'Ceriodaphnia':
-            r1_cer = np.abs(100 - pd.to_numeric(value_df)) / 100
-            print(r1_cer, "CERI", value_df)
-            r2_cer = np.abs(np.nan_to_num((r1_cer - R1_Controle_CER(dataframe)) / (1 - R1_Controle_CER(dataframe))))
-            result_cer = np.abs(np.nan_to_num((np.log10(1 - r2_cer))))
+            r1_cer = ((100 - pd.to_numeric(value_df)) / 100)
+            r2_cer = (r1_cer - R1_Controle_CER(dataframe)) / (1 - R1_Controle_CER(dataframe))
+            result_cer = (np.log10(1 - r2_cer))
 
-            print(r1_cer, "Ceriodaphnia", r2_cer, result_cer, pd.to_numeric(value_df))
+            print("Ceriodaphnia", r1_cer, "r1 cer", r2_cer, "r2 cer", result_cer, "resultado cer", pd.to_numeric(value_df), "valor que chegou", R1_Controle_CER(dataframe), "metodo r1 controle")
             return result_cer
 
 
@@ -141,10 +141,10 @@ def calculate_ecotox(dataframe):
         ceriodaphnia_value = Ceriodaphnia(dataframe)
         chlorella_value = Chlorella(dataframe)
 
-        media_ecotox = np.abs(np.nan_to_num((ceriodaphnia_value + chlorella_value) / 2))
-        dataframe["RISCO_ECOTOX"] = np.abs(np.nan_to_num(1 - np.power(10, media_ecotox)))
-        print(media_ecotox)
-        print(dataframe["RISCO_ECOTOX"][0])
+        media_ecotox = np.nan_to_num((ceriodaphnia_value + chlorella_value) / 2)
+        dataframe["RISCO_ECOTOX"] = np.nan_to_num(1 - np.power(10, media_ecotox))
+        print(media_ecotox, "media ecotox")
+        print(dataframe["RISCO_ECOTOX"][0], "resultado final de tudo")
 
         conditions = [
             (dataframe["RISCO_ECOTOX"] >= 0.76),
@@ -153,7 +153,7 @@ def calculate_ecotox(dataframe):
             (dataframe["RISCO_ECOTOX"] >= 0) & (dataframe["RISCO_ECOTOX"] <= 0.25)
         ]
 
-        classifications = ["Baixo", "Moderado", "Alto", "Extremo"]
+        classifications = ["Extremo", "Alto", "Moderado", "Baixo"]
 
         dataframe["Classificacao"] = np.select(conditions, classifications, default=0)
 
@@ -167,7 +167,7 @@ def calculate_ecotox(dataframe):
 def color_classificacao(val):
     color = ''
     if val == 'Baixo':
-        color = 'blue'
+        color = 'white'
     elif val == 'Moderado':
         color = 'green'
     elif val == 'Alto':
