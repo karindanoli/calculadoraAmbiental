@@ -4,7 +4,7 @@ import joblib
 import pycaret.regression
 
 def app():
-    modelo = joblib.load('modeloCombinadoDoutorado.pkl')
+    modelo = joblib.load('modeloCombinado.pkl')
 
     st.title('Previsão')
     # Upload
